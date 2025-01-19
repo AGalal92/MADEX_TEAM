@@ -12,13 +12,13 @@ import Portfolio from '../components/Portfolio';
 import Team from '../components/Team';
 import Contact from '../components/Contact';
 import Footer from '../components/Footer';
-import ScrollToTop from '@/components/ScrollToTop';
+import ScrollToTop from '../components/ScrollToTop';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { isAuthenticated } from '@/utils/auth';
-import ECommerce from "@/components/Dashboard/E-commerce";
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
-import Loader from "@/components/common/Loader";
+import { isAuthenticated } from '../utils/auth';
+import ECommerce from "../components/Dashboard/E-commerce";
+import DefaultLayout from "../components/Layouts/DefaultLayout";
+import Loader from "../components/common/Loader";
 export default function Home() {
   const router = useRouter();
   const [authenticated, setAuthenticated] = useState(false);

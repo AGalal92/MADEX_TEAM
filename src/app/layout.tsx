@@ -1,10 +1,10 @@
 "use client";
 import { useEffect, useState, lazy, Suspense, startTransition } from "react";
 import { useRouter } from "next/navigation";
-import { isAuthenticated } from "@/utils/auth";
-import Loader from "@/components/common/Loader";
+import { isAuthenticated } from "../utils/auth";
+import Loader from "../components/common/Loader";
 import { GeistSans, GeistMono } from "geist/font";
-import { useAuthStore } from "@/store/authStore"; // Import the global store
+import { useAuthStore } from "../store/authStore"; // Import the global store
 
 // Lazy load the layouts
 const AuthenticatedLayout = lazy(() => import("./AuthenticatedLayout"));

@@ -1,7 +1,7 @@
 import "jsvectormap/dist/jsvectormap.css";
 import "flatpickr/dist/flatpickr.min.css";
-import "@/css/satoshi.css";
-import "@/css/style.css";
+import "../css/satoshi.css";
+import "../css/style.css";
 import React from "react";
 import { GeistSans, GeistMono } from "geist/font";
 import "../css/globals.css";
