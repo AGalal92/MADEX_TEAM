@@ -325,6 +325,7 @@ const menuGroups = [
 const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const pathname = usePathname();
   const [pageName, setPageName] = useLocalStorage("selectedMenu", "dashboard");
+  console.log("🚀 ~ Sidebar ~ pageName:", pageName)
 
   return (
     <ClickOutside onClick={() => setSidebarOpen(false)}>
@@ -339,7 +340,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             <Image
               width={176}
               height={32}
-              src={"/images/logo/logo.svg"}
+              src={"/images/logo/MadeX.png"}
               alt="Logo"
               priority
             />

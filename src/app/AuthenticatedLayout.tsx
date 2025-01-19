@@ -10,6 +10,7 @@ export default function AuthenticatedLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  console.log("🚀 ~ hello from AuthenticatedLayout:")
   return (
     <div className="dark:bg-boxdark-2 dark:text-bodydark">
       {children}

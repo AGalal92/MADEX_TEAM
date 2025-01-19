@@ -1,10 +1,11 @@
 "use client";
-import { useEffect, useState, lazy, Suspense, startTransition } from "react";
+import { useState, lazy, Suspense, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { isAuthenticated } from "../utils/auth";
 import Loader from "../components/common/Loader";
 import { GeistSans, GeistMono } from "geist/font";
 import { useAuthStore } from "../store/authStore"; // Import the global store
+import { useAuthLayout } from "@/hooks/useAuthLayout"; // Import the custom hook
 
 // Lazy load the layouts
 const AuthenticatedLayout = lazy(() => import("./AuthenticatedLayout"));
@@ -16,21 +17,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const router = useRouter();
-  const { isAuthenticated: authenticated, setAuth } = useAuthStore(); // Use global state
+  const { isAuthenticated: authenticated } = useAuthStore(); // Use global state
   const [loading, setLoading] = useState(true);
+  const authLayout = useAuthLayout(); // Use the custom hook to get authLayout value
+  console.log("🚀 ~ authLayout:", authLayout)
 
   // Check authentication status on mount
   useEffect(() => {
     const checkAuth = async () => {
       const authStatus = await isAuthenticated();
       console.log("Auth Status:", authStatus); // Verify the auth status
-      setAuth(authStatus); // Update global state
+      useAuthStore.getState().setAuth(authStatus); // Update global state
       setLoading(false);
     };
 
     checkAuth();
-  }, [setAuth]); // Only include setAuth in the dependency array
-
+  }, []);
 
   return (
     <html lang="en">
@@ -43,7 +45,7 @@ export default function RootLayout({
             <Loader />
           ) : (
             <Suspense fallback={<Loader />}>
-              {authenticated ? (
+              {authLayout || authenticated ? (
                 <AuthenticatedLayout>{children}</AuthenticatedLayout>
               ) : (
                 <UnauthenticatedLayout>{children}</UnauthenticatedLayout>
