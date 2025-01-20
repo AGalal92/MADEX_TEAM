@@ -5,6 +5,7 @@ const aboutController = require('../controllers/aboutController');
 // Get "about" data for a specific ID
 router.get('/', aboutController.getAbout);
 
+
 // Update "about" data for a specific ID
 router.put('/:id', aboutController.updateAbout);
 

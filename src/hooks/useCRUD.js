@@ -13,6 +13,7 @@ const useCRUD = (baseApi, storeId) => {
     setLoading(true);
     try {
       const response = await axios.get(apiUrl);
+      console.log("🚀 ~ fetchData ~ response:", response)
       setData(response.data);
       setError(null);
     } catch (err) {
@@ -25,6 +26,7 @@ const useCRUD = (baseApi, storeId) => {
   // Create a new record
   const createData = useCallback(
     async (newRecord) => {
+      console.log("🚀 ~ newRecord:", newRecord)
       setLoading(true);
       try {
         const response = await axios.post(apiUrl, newRecord);
