@@ -19,14 +19,15 @@ const seedUser = async () => {
     const hashedPassword = await bcrypt.hash(plainPassword, 10); // Hash the password
 
     const user = {
+      name: 'Admin',
       email: 'admin@admin.com',
       password: hashedPassword,
     };
 
     // Insert the user into the database
     const [result] = await connection.execute(
-      'INSERT INTO users (email, password) VALUES (?, ?)',
-      [user.email, user.password]
+      'INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
+      [user.name, user.email, user.password]
     );
 
     console.log('User seeded successfully:', result);
