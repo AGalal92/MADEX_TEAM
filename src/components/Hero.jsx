@@ -12,7 +12,7 @@ export default function Hero() {
       color: '#ffc907', // Highlight color
     },
     subtitle: {
-      text: 'Coming Soon',
+      text: '',
       fontSize: '6em',
       fontWeight: 900,
       color: '#ffc907',

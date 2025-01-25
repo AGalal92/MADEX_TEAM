@@ -1,5 +1,5 @@
 const express = require('express');
-const upload = require('../middleware/upload'); // File upload middleware
+const { upload, compressFiles } = require('../middleware/upload'); // Import both
 const {
   getAllWorks,
   getWorkById,
@@ -19,7 +19,9 @@ router.post(
       { name: 'image', maxCount: 1 },
       { name: 'video', maxCount: 1 },
       { name: 'slider_images', maxCount: 10 },
-    ]),
+      { name: 'image_before', maxCount: 1 },
+      { name: 'image_after', maxCount: 1 },
+    ]),compressFiles,
     (req, res, next) => {
       console.log('Files:', req.files); // Log uploaded files
       console.log('Body:', req.body);   // Log form-data fields
@@ -35,8 +37,9 @@ router.post(
       { name: 'image', maxCount: 1 },
       { name: 'video', maxCount: 1 },
       { name: 'slider_images', maxCount: 10 },
-    ]),
-    updateWork
+      { name: 'image_before', maxCount: 1 },
+      { name: 'image_after', maxCount: 1 },
+    ]),compressFiles, updateWork
   );
 router.delete('/:id', deleteWork);
 
