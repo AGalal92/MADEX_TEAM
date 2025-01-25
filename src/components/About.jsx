@@ -17,7 +17,7 @@ export default function About({ about }) {
           <div className="col-lg-6 aos-init aos-animate" data-aos="fade-up" data-aos-delay="100">
             <h3>{aboutaboutData.title}</h3>
             <Image
-              src={aboutaboutData.img1}
+              src={`http://localhost:5001/storage/${aboutaboutData.img1}`} // Full URL
               alt="About Image"
               width={600}
               height={400}
@@ -44,7 +44,7 @@ export default function About({ about }) {
               {/* Image with Play Button */}
               <div className="position-relative mt-4">
                 <Image
-                  src={aboutaboutData?.img2}
+                  src={`http://localhost:5001/storage/${aboutaboutData.img2}`} // Full URL
                   alt="About Image 2"
                   width={600}
                   height={400}
