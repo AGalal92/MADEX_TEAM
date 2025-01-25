@@ -1,46 +1,10 @@
 import React from 'react';
 import Image from 'next/image';
 
-const Team = () => {
-  // Dummy JSON data for team members
-  const teamMembers = [
-    {
-      id: 1,
-      image: '/assets/images/team-1.jpg',
-      name: 'Walter White',
-      position: 'Chief Executive Officer',
-      socialLinks: [
-        { icon: 'bi bi-twitter-x', url: '#' },
-        { icon: 'bi bi-facebook', url: '#' },
-        { icon: 'bi bi-instagram', url: '#' },
-        { icon: 'bi bi-linkedin', url: '#' },
-      ],
-    },
-    {
-      id: 2,
-      image: '/assets/images/team-2.jpg',
-      name: 'Sarah Jhonson',
-      position: 'Product Manager',
-      socialLinks: [
-        { icon: 'bi bi-twitter-x', url: '#' },
-        { icon: 'bi bi-facebook', url: '#' },
-        { icon: 'bi bi-instagram', url: '#' },
-        { icon: 'bi bi-linkedin', url: '#' },
-      ],
-    },
-    {
-      id: 3,
-      image: '/assets/images/team-3.jpg',
-      name: 'William Anderson',
-      position: 'CTO',
-      socialLinks: [
-        { icon: 'bi bi-twitter-x', url: '#' },
-        { icon: 'bi bi-facebook', url: '#' },
-        { icon: 'bi bi-instagram', url: '#' },
-        { icon: 'bi bi-linkedin', url: '#' },
-      ],
-    },
-  ];
+const Team = ({ team }) => {
+  if (!team || team.length === 0) {
+    return <p>Loading...</p>; // Display a loading state if no data is passed
+  }
 
   return (
     <section id="team" className="team section dark-background">
@@ -51,7 +15,7 @@ const Team = () => {
 
       <div className="container">
         <div className="row gy-5">
-          {teamMembers.map((member) => (
+          {team.map((member) => (
             <div
               key={member.id}
               className="col-lg-4 col-md-6 aos-init aos-animate"
@@ -72,7 +36,7 @@ const Team = () => {
                   <h4>{member.name}</h4>
                   <span>{member.position}</span>
                   <div className="social">
-                    {member.socialLinks.map((link, index) => (
+                    {member.social_links.map((link, index) => (
                       <a key={index} href={link.url}>
                         <i className={link.icon}></i>
                       </a>

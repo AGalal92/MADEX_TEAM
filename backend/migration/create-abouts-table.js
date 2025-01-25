@@ -11,6 +11,7 @@ async function createAboutsTable() {
       slug2 VARCHAR(255) DEFAULT '',
       par1 TEXT NULL,
       par2 TEXT NULL,
+      list_items JSON NOT NULL,
       link VARCHAR(255) NULL,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP

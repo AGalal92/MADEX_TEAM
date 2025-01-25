@@ -1,10 +1,12 @@
 const pool = require('../db'); // Assuming your db.js exports the MySQL pool
+
 async function createWorkCategoriesTable() {
   const query = `
     CREATE TABLE IF NOT EXISTS work_categories (
       id INT AUTO_INCREMENT PRIMARY KEY,
-      name VARCHAR(255) NOT NULL,
-      slug VARCHAR(255) NOT NULL UNIQUE,
+      category VARCHAR(255) NOT NULL,
+      img VARCHAR(255) NOT NULL,
+      title VARCHAR(255) NOT NULL,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     );

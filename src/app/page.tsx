@@ -19,21 +19,15 @@ import { isAuthenticated } from '../utils/auth';
 import ECommerce from "../components/Dashboard/E-commerce";
 import DefaultLayout from "../components/Layouts/DefaultLayout";
 import Loader from "../components/common/Loader";
+import { useAllData } from '../hooks/useAllData';
+
 export default function Home() {
   const router = useRouter();
   const [authenticated, setAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true); // Add a loading state
 
-  const aboutData = {
-    title: 'About Us',
-    img1: '/assets/images/about.jpg',
-    par1: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    par2: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-    slug1: 'Ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-    slug2: 'Duis aute irure dolor in reprehenderit in voluptate velit.',
-    img2: '/assets/images/about-2.jpg',
-    link: 'https://example.com',
-  };
+  // Fetch all data using the custom hook
+  const { allData, loading: dataLoading, error: dataError } = useAllData();
 
   useEffect(() => {
     // Check authentication status
@@ -63,40 +57,57 @@ export default function Home() {
     });
   }, [router]);
 
-  // Show a loading spinner while checking authentication
-  if (loading) {
-    return <Loader/>; // Replace with a proper loading spinner
+  // Show a loading spinner while checking authentication or fetching data
+  if (loading || dataLoading) {
+    return <Loader />;
   }
 
-  // Show landing page if not authenticated
-  if (authenticated) {
-    return (
-      <>
-       <DefaultLayout>
-      <ECommerce />
-    </DefaultLayout>
-       
-      </>
-    );
+  // Show error message if data fetching fails
+  if (dataError) {
+    return <p className="text-center text-danger">Error: {dataError}</p>;
   }
 
   // Show ECommerce dashboard if authenticated
+  if (authenticated) {
+    return (
+      <DefaultLayout>
+        <ECommerce />
+      </DefaultLayout>
+    );
+  }
+
+  // Show landing page if not authenticated
   return (
-   <>
-    <DashboardHeader />
-        <Hero />
-        <About about={aboutData} />
-        <Stats />
-        <FeaturedServices />
-        <Clients />
-        <Features />
-        <Services />
-        <Testimonials />
-        <Portfolio />
-        <Team />
-        <Contact />
-        <Footer />
-        <ScrollToTop />
+    <>
+      <DashboardHeader />
+      <Hero />
+
+      {/* About Section */}
+      <About about={allData.aboutData} />
+
+      {/* Stats Section */}
+      {/* <Stats /> */}
+
+      {/* Featured Services Section */}
+      {/* <FeaturedServices /> */}
+
+      {/* Clients Section */}
+      {/* <Clients /> */}
+
+      {/* Features Section */}
+      <Features services={allData.servicesData} />
+
+      {/* Portfolio Section */}
+      <Portfolio works={allData.worksCategoryData} />
+
+      {/* Team Section */}
+      <Team team={allData.teamData} />
+
+      {/* Contact Section */}
+      <Contact contact={allData.contactData} />
+
+      <Footer />
+      <ScrollToTop />
     </>
   );
 }

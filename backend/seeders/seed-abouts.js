@@ -2,37 +2,32 @@ const pool = require('../db'); // Assuming your db.js exports the MySQL pool
 
 async function seedAboutsTable() {
   const insertQuery = `
-    INSERT INTO abouts (title, img1, img2, slug1, slug2, par1, par2, link)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+    INSERT INTO abouts (title, img1, img2, slug1, slug2, par1, par2, link,list_items)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
   `;
 
   const abouts = [
     {
       title: 'About Us',
-      img1: 'about-image1.jpg',
-      img2: 'about-image2.jpg',
+      img1: '/assets/images/about-image1.jpg',
+      img2: '/assets/images/about-image2.jpg',
       slug1: 'about-section-one',
       slug2: 'about-section-two',
       par1: 'This is the first paragraph about us.',
       par2: 'This is the second paragraph about us.',
       link: 'https://example.com/about',
-    },
-    {
-      title: 'Our Mission',
-      img1: null,
-      img2: null,
-      slug1: 'mission-section-one',
-      slug2: 'mission-section-two',
-      par1: 'This is the first paragraph about our mission.',
-      par2: 'This is the second paragraph about our mission.',
-      link: 'https://example.com/mission',
+      list_items: JSON.stringify([
+        'Ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+        'Duis aute irure dolor in reprehenderit in voluptate velit.',
+        'Ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate trideta storacalaperda mastiro dolore eu fugiat nulla pariatur.',
+      ]),
     },
   ];
 
   try {
     for (const about of abouts) {
-      const { title, img1, img2, slug1, slug2, par1, par2, link } = about;
-      await pool.query(insertQuery, [title, img1, img2, slug1, slug2, par1, par2, link]);
+      const { title, img1, img2, slug1, slug2, par1, par2, link, list_items } = about;
+      await pool.query(insertQuery, [title, img1, img2, slug1, slug2, par1, par2, link, list_items]);
     }
     console.log('Abouts table seeded successfully.');
   } catch (error) {
@@ -43,3 +38,4 @@ async function seedAboutsTable() {
 }
 
 seedAboutsTable();
+module.exports = seedAboutsTable;

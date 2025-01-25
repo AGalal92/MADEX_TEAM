@@ -4,7 +4,7 @@ export default function Contact() {
   const contactData = {
     sectionTitle: {
       title: "Contact",
-      description: "Necessitatibus eius consequatur",
+      description: "To Reach Us",
     },
     contactInfo: [
       {
