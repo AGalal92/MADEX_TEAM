@@ -9,7 +9,15 @@ export const useAllData = () => {
   const { data: worksCategoryData, loading: worksCategoryLoading, error: worksCategoryError } = useCrud('work-categories');
   const { data: teamData, loading: teamLoading, error: teamError } = useCrud('team');
   const { data: contactData, loading: contactLoading, error: contactError } = useCrud('contact-us');
-
+// Extract the project data from worksData (filter or map logic)
+const workProjectData = worksData
+? worksData.map(({ id, image, video, work_category_id }) => ({
+    id,
+    image,
+    video,
+    categoryId: work_category_id,
+  }))
+: [];
   // Combine loading and error states
   const loading = aboutLoading || servicesLoading || worksLoading || worksCategoryLoading || teamLoading || contactLoading;
   const error = aboutError || servicesError || worksError || worksCategoryError || teamError || contactError;
@@ -20,6 +28,7 @@ export const useAllData = () => {
     servicesData,
     worksData,
     worksCategoryData,
+    workProjectData,
     teamData,
     contactData,
   };

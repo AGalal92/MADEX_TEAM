@@ -23,6 +23,10 @@ import {
   Typography,
   useTheme,
   Chip,
+  Snackbar,
+  Alert,
+  CircularProgress,
+  AlertColor,
 } from '@mui/material';
 import { Edit, Delete, Add, Close } from '@mui/icons-material';
 import axios from 'axios';
@@ -46,6 +50,10 @@ const ServicesTable = () => {
   const [editListItemModalOpen, setEditListItemModalOpen] = useState(false); // Modal for editing list items
   const [currentListItemIndex, setCurrentListItemIndex] = useState(null); // Index of the list item being edited
   const [currentListItemText, setCurrentListItemText] = useState(''); // Text of the list item being edited
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState<AlertColor>('success');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const API_BASE_URL = 'http://localhost:5001/api/services'; // Replace with your backend URL
   const STORAGE_BASE_URL = 'http://localhost:5001/storage'; // Replace with your backend URL
@@ -72,6 +80,7 @@ const ServicesTable = () => {
       setServices(services);
     } catch (error) {
       console.error('Error fetching services:', error);
+      showSnackbar('Error fetching data.', 'error');
     }
   };
 
@@ -166,7 +175,7 @@ const ServicesTable = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setIsSubmitting(true);
     const data = new FormData();
     data.append('title', formData.title);
     data.append('icon', formData.icon);
@@ -187,9 +196,14 @@ const ServicesTable = () => {
       }
       fetchServices();
       handleCloseModal();
+      showSnackbar('successfully!', 'success');
     } catch (error) {
       console.error('Error saving service:', error);
-    }
+      showSnackbar('successfully!', 'success');
+
+    } finally {
+      setIsSubmitting(false);
+  };
   };
 
   const handleOpenDialog = (id) => {
@@ -207,9 +221,21 @@ const ServicesTable = () => {
       await axios.delete(`${API_BASE_URL}/${deleteId}`);
       fetchServices();
       handleCloseDialog();
+      showSnackbar('Service deleted successfully.','success');
     } catch (error) {
       console.error('Error deleting service:', error);
+      showSnackbar('Error deleting service.', 'error');
     }
+  };
+
+  const showSnackbar = (message, severity) => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setSnackbarOpen(true);
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
   };
 
   return (
@@ -541,9 +567,12 @@ const ServicesTable = () => {
                 form="serviceForm"
                 variant="contained"
                 color="primary"
-                startIcon={editService ? <Edit /> : <Add />}
+                startIcon={isSubmitting ? <CircularProgress size={16} color="inherit" /> : editService ? <Edit /> : <Add />}
+                disabled={isSubmitting}
+               
               >
-                {editService ? 'Update' : 'Create'}
+                 {isSubmitting ? 'Submitting...' : editService ? 'Update' : 'Create'}
+
               </Button>
             </Box>
           </Box>
@@ -592,7 +621,17 @@ const ServicesTable = () => {
             </Box>
           </Box>
         </Modal>
-
+      {/* Snackbar */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={4000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
         {/* Dialog for Delete Confirmation */}
         <Dialog open={dialogOpen} onClose={handleCloseDialog}>
           <DialogTitle>Confirm Delete</DialogTitle>

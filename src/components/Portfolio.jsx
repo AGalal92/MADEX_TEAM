@@ -2,33 +2,49 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import { Modal, Box, Tooltip } from '@mui/material';
+import { PlayCircleOutline, Link } from '@mui/icons-material';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 
-export default function Portfolio({ works }) {
+export default function Portfolio({ category, project }) {
   const [activeFilter, setActiveFilter] = useState('*'); // State for the active filter
+  const [videoModalOpen, setVideoModalOpen] = useState(false); // Modal state for video
+  const [currentVideo, setCurrentVideo] = useState(''); // Current video to display
+  const router = useRouter();
 
-  if (!works || works.length === 0) {
+  const STORAGE_BASE_URL = 'http://localhost:5001/storage'; // Base URL for images and videos
+
+  if (!category || !project || category.length === 0 || project.length === 0) {
     return <p>Loading...</p>; // Display a loading state if no data is passed
   }
 
-  // Extract unique categories from `works`
-  const categories = [...new Set(works.map((work) => work.category))];
+  // Get unique category IDs from the project
+  const projectCategoryIds = [...new Set(project.map((proj) => proj.categoryId))];
+
+  // Filter categories to only include those that are present in the project data
+  const filteredCategories = category.filter((cat) =>
+    projectCategoryIds.includes(cat.id)
+  );
 
   // Filter works based on the active filter
   const filteredWorks =
     activeFilter === '*'
-      ? works
-      : works.filter((work) => work.category.toLowerCase() === activeFilter);
+      ? project
+      : project.filter((work) => work.categoryId.toString() === activeFilter);
 
-  // Styled scrollable container
-  const containerStyle = {
-    height: '600px', // Adjust as needed
-    overflowY: 'auto',
-    padding: '30px',
-    scrollbarWidth: 'thin', // For Firefox
-    scrollbarColor: '#ffc107 #000', // Scroll thumb and track colors
+  // Open video modal
+  const handleOpenVideoModal = (video) => {
+    setCurrentVideo(`${STORAGE_BASE_URL}/${video}`);
+    setVideoModalOpen(true);
   };
 
-  // Add scroll style for WebKit browsers (Chrome, Edge, Safari)
+  // Close video modal
+  const handleCloseVideoModal = () => {
+    setVideoModalOpen(false);
+    setCurrentVideo('');
+  };
+
   const scrollStyle = `
     ::-webkit-scrollbar {
       width: 4px;
@@ -44,110 +60,154 @@ export default function Portfolio({ works }) {
 
   return (
     <>
-      {/* Add WebKit scrollbar styles */}
-      <style>{scrollStyle}</style>
+       <style>{scrollStyle}</style>
+    <section id="portfolio" className="portfolio section dark-background">
+      {/* Section Title */}
+      <div className="container section-title" data-aos="fade-up">
+        <h2>Portfolio</h2>
+        <p>CHECK OUR PORTFOLIO</p>
+      </div>
 
-      <section id="portfolio" className="portfolio section dark-background">
-        {/* Section Title */}
-        <div className="container section-title aos-init aos-animate" data-aos="fade-up">
-          <h2>Portfolio</h2>
-          <p>CHECK OUR PORTFOLIO</p>
-        </div>
-
-        {/* Portfolio Filters and Items */}
-        <div className="container">
-          <div className="isotope-layout" data-default-filter="*" data-layout="masonry" data-sort="original-order">
-            {/* Filters */}
-            <ul
-              className="portfolio-filters isotope-filters aos-init aos-animate"
-              data-aos="fade-up"
-              data-aos-delay="100"
+      {/* Portfolio Filters and Items */}
+      <div className="container">
+        <div className="isotope-layout" data-default-filter="*" data-layout="masonry" data-sort="original-order">
+          {/* Filters */}
+          <ul
+            className="portfolio-filters isotope-filters"
+            data-aos="fade-up"
+            data-aos-delay="100"
+            style={{
+              backgroundColor: '#000',
+              padding: '10px',
+              borderRadius: '8px',
+              marginBottom: '20px',
+            }}
+          >
+            <li
+              className={activeFilter === '*' ? 'filter-active active' : ''}
+              onClick={() => setActiveFilter('*')}
               style={{
-                backgroundColor: '#000', // Set the background color
-                padding: '10px', // Add some padding for spacing
-                borderRadius: '8px', // Optional: Add rounded corners
-                marginBottom: '20px', // Optional: Add some spacing below the filters
+                color: activeFilter === '*' ? '#ffc107' : '',
+                cursor: 'pointer',
               }}
             >
+              All
+            </li>
+            {filteredCategories.map((cat) => (
               <li
-                className={activeFilter === '*' ? 'filter-active active' : ''}
-                onClick={() => setActiveFilter('*')}
+                key={cat.id}
+                className={activeFilter === cat.id.toString() ? 'active' : ''}
+                onClick={() => setActiveFilter(cat.id.toString())}
                 style={{
-                  color: activeFilter === '*' ? '#ffc107' : '', // Highlight active tab
+                  color: activeFilter === cat.id.toString() ? '#ffc107' : '',
                   cursor: 'pointer',
                 }}
               >
-                All
+                {cat.category.charAt(0).toUpperCase() + cat.category.slice(1)}
               </li>
-              {categories.map((category, index) => (
-                <li
-                  key={index}
-                  className={activeFilter === category.toLowerCase() ? 'active' : ''}
-                  onClick={() => setActiveFilter(category.toLowerCase())}
-                  style={{
-                    color: activeFilter === category.toLowerCase() ? '#ffc107' : '', // Highlight active tab
-                    cursor: 'pointer',
-                  }}
-                >
-                  {category.charAt(0).toUpperCase() + category.slice(1)}
-                </li>
-              ))}
-            </ul>
+            ))}
+          </ul>
 
+          {/* Portfolio Items */}
+          <div className="row gy-4 isotope-container" data-aos="fade-up" data-aos-delay="200">
+            {filteredWorks.map((work) => (
+              <div
+                key={work.id}
+                className="col-lg-4 col-md-6 portfolio-item isotope-item"
+              >
+                <div className="portfolio-content" style={{ textAlign: 'center' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    {/* Image */}
+                    <Image
+                      src={`${STORAGE_BASE_URL}/${work.image}`} // Use the correct image path
+                      alt={`Project ${work.id}`}
+                      width={400}
+                      height={300}
+                      className="img-fluid"
+                      style={{ marginBottom: '10px' }}
+                    />
 
-            {/* Portfolio Items */}
-            <div
-              className="row gy-4 isotope-container aos-init aos-animate"
-              data-aos="fade-up"
-              data-aos-delay="200"
-              style={containerStyle}
-            >
-              {filteredWorks.map((work) => (
-                <div
-                  key={work.id}
-                  className={`col-lg-4 col-md-6 portfolio-item isotope-item filter-${work.category
-                    .toLowerCase()
-                    .replace(/\s+/g, '-')}`}
-                >
-                  <div className="portfolio-content" style={{ textAlign: 'center' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                      {/* Image */}
-                      <Image
-                        src={work.img}
-                        alt={work.title}
-                        width={400}
-                        height={300}
-                        className="img-fluid"
-                        style={{ marginBottom: '10px' }} // Add some spacing below the image
-                      />
+                    {/* Portfolio Info */}
+                    <div className="portfolio-info" style={{ textAlign: 'center', marginTop: '10px' }}>
+                      <h4>Project #{work.id}</h4>
+                      <p>
+                        {filteredCategories.find((cat) => cat.id === work.categoryId)?.category}
+                      </p>
+                      <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', marginTop: '40px' }}>
+                        {/* Review Video Icon */}
+                        <Tooltip title="Review Video">
+                          <PlayCircleOutline
+                            onClick={() => handleOpenVideoModal(work.video)}
+                            style={{
+                              fontSize: '30px',
+                              color: '#ffc107',
+                              cursor: 'pointer',
+                            }}
+                          />
+                        </Tooltip>
 
-                      {/* Portfolio Info */}
-                      <div className="portfolio-info" style={{ textAlign: 'center', marginTop: '10px' }}>
-                        <h4>{work.title}</h4>
-                        <p>{work.category.charAt(0).toUpperCase() + work.category.slice(1)}</p>
-                        <div>
-                          <a
-                            href={work.img}
-                            title={work.title}
-                            data-gallery={`portfolio-gallery-${work.category}`}
-                            className="glightbox preview-link"
-                            style={{ marginRight: '10px' }}
-                          >
-                            <i className="bi bi-zoom-in"></i>
-                          </a>
-                          <a href="#" title="More Details" className="details-link">
-                            <i className="bi bi-link-45deg"></i>
-                          </a>
-                        </div>
+                        {/* Redirect Icon */}
+                        <Tooltip title="More Details">
+                          <Link
+                            onClick={() => router.push(`/works/${work.id}`)}
+                            style={{
+                              fontSize: '30px',
+                              color: '#ffc107',
+                              cursor: 'pointer',
+                            }}
+                          />
+                        </Tooltip>
                       </div>
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         </div>
-      </section>
+      </div>
+
+      {/* Video Modal */}
+      <AnimatePresence>
+        {videoModalOpen && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ duration: 0.2, ease: "easeInOut" }}
+          >
+            <Modal open={videoModalOpen} onClose={handleCloseVideoModal}>
+              <Box
+                sx={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  width: '90%',
+                  maxWidth: '500px',
+                  aspectRatio: '9/16', // Reel aspect ratio
+                  bgcolor: '#1c1f23',
+                  borderRadius: '10px',
+                  boxShadow: 24,
+                  p: 1,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <video
+                  src={currentVideo}
+                  controls
+                  autoPlay
+                  style={{ width: '100%', height: '100%', borderRadius: '10px' }}
+                ></video>
+              </Box>
+            </Modal>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </section>
     </>
+
   );
 }

@@ -1,3 +1,5 @@
+const fs = require('fs'); // Import the file system module
+const path = require('path'); // Import the path module
 const pool = require('../db'); // Assuming db.js exports the MySQL pool
 
 // Get all team members

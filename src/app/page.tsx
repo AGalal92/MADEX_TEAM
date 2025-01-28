@@ -98,7 +98,10 @@ export default function Home() {
       <Features services={allData.servicesData} />
 
       {/* Portfolio Section */}
-      <Portfolio works={allData.worksCategoryData} />
+      <Portfolio
+        category={allData.worksCategoryData} // Pass worksCategoryData as the category prop
+        project={allData.workProjectData} // Pass workProjectData as the project prop
+      />
 
       {/* Team Section */}
       <Team team={allData.teamData} />

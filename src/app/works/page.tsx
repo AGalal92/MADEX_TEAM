@@ -28,9 +28,13 @@ import {
   InputLabel,
   FormControl,
   Chip,
+  Snackbar,
+  Alert,
+  CircularProgress,
 } from '@mui/material';
 import { Edit, Delete, Add, Close } from '@mui/icons-material';
 import axios from 'axios';
+
 
 const WorksTable = () => {
   const [works, setWorks] = useState([]);
@@ -59,7 +63,10 @@ const WorksTable = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
   const [sliderImages, setSliderImages] = useState([]); // Manage slider images as files
-  console.log("🚀 ~ WorksTable ~ sliderImages:", sliderImages)
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error" | "warning" | "info">('success');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const handleAddSliderImage = (file) => {
     if (sliderImages.length >= 10) {
       alert('You can upload a maximum of 10 slider images.');
@@ -95,6 +102,7 @@ const WorksTable = () => {
       setWorks(response.data);
     } catch (error) {
       console.error('Error fetching works:', error);
+      showSnackbar('Error fetching data.', 'error');
     }
   };
 
@@ -209,7 +217,7 @@ const WorksTable = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setIsSubmitting(true);
     const data = new FormData();
 
     // Append form fields from formData state
@@ -237,11 +245,13 @@ const WorksTable = () => {
         await axios.put(`${API_BASE_URL}/${editWork.id}`, data, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
+        showSnackbar('Works updated successfully!', 'success');
       } else {
         // Create new work
         await axios.post(API_BASE_URL, data, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
+        showSnackbar('Works created successfully!', 'success');
       }
 
       // Refresh works data and close modal
@@ -250,6 +260,8 @@ const WorksTable = () => {
     } catch (error) {
       console.error('Error saving work:', error);
       alert('An error occurred while saving the work. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -267,11 +279,21 @@ const WorksTable = () => {
       await axios.delete(`${API_BASE_URL}/${deleteId}`);
       fetchWorks();
       setDialogOpen(false);
+      showSnackbar('Work deleted successfully!', 'success');
     } catch (error) {
       console.error('Error deleting work:', error);
+      showSnackbar('Failed to delete work.', 'error');
     }
   };
+  const showSnackbar = (message, severity) => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setSnackbarOpen(true);
+  };
 
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
   return (
     <DefaultLayout>
       <Box sx={{ p: 4 }}>
@@ -619,14 +641,28 @@ const WorksTable = () => {
                 type="submit"
                 variant="contained"
                 color="primary"
-                startIcon={editWork ? <Edit /> : <Add />}
+                startIcon={isSubmitting ? <CircularProgress size={16} color="inherit" /> : editWork ? <Edit /> : <Add />}
+                disabled={isSubmitting}
                 onClick={handleSubmit}
               >
-                {editWork ? 'Update Work' : 'Create Work'}
+                {isSubmitting ? 'Submitting...' : editWork ? 'Update' : 'Create'}
+
               </Button>
             </Box>
           </Box>
         </Modal>
+
+        {/* Snackbar */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={4000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
 
         {/* Delete Dialog */}
         <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>

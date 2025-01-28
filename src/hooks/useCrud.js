@@ -32,6 +32,20 @@ export const useCrud = (endpoint) => {
     }
   };
 
+   // Fetch specific project data
+   const fetchProject = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`${API_BASE_URL}/api/${endpoint}/project`);
+      return response.data; // Return the project data
+    } catch (err) {
+      throw err.response?.data || 'Error fetching project data';
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
   // Update data
   const updateData = async (id, updatedData) => {
     try {
@@ -58,5 +72,5 @@ export const useCrud = (endpoint) => {
     fetchData();
   }, [endpoint]);
 
-  return { data, loading, error, createData, updateData, deleteData, fetchData };
+  return { data, loading, error, createData, updateData, deleteData, fetchData,fetchProject };
 };

@@ -22,6 +22,10 @@ import {
   Typography,
   useTheme,
   Chip,
+  Snackbar,
+  Alert,
+  CircularProgress,
+  AlertColor,
 } from '@mui/material';
 import { Edit, Delete, Add, Close } from '@mui/icons-material';
 import axios from 'axios';
@@ -45,6 +49,10 @@ const AboutsTable = () => {
   const [img1Preview, setImg1Preview] = useState(null);
   const [img2Preview, setImg2Preview] = useState(null);
   const [listItems, setListItems] = useState([]); // State for managing list_items
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState<AlertColor>('success');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const API_BASE_URL = 'http://localhost:5001/api/abouts';
   const STORAGE_BASE_URL = 'http://localhost:5001/storage';
@@ -57,6 +65,7 @@ const AboutsTable = () => {
       setAbouts(response.data);
     } catch (error) {
       console.error('Error fetching abouts:', error);
+      showSnackbar('Error fetching data.', 'error');
     }
   };
 
@@ -136,7 +145,7 @@ const AboutsTable = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setIsSubmitting(true);
     const data = new FormData();
     data.append('title', formData.title);
     data.append('slug1', formData.slug1);
@@ -161,18 +170,22 @@ const AboutsTable = () => {
             'Content-Type': 'multipart/form-data',
           },
         });
+        showSnackbar('About entry updated successfully!', 'success');
       } else {
         await axios.post(API_BASE_URL, data, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
         });
+        showSnackbar('About entry created successfully!', 'success');
       }
 
       fetchAbouts();
       handleCloseModal();
     } catch (error) {
       console.error('Error saving about:', error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -198,8 +211,10 @@ const AboutsTable = () => {
       await axios.delete(`${API_BASE_URL}/${deleteId}`);
       fetchAbouts();
       handleCloseDialog();
+      showSnackbar('About entry deleted successfully!', 'success');
     } catch (error) {
       console.error('Error deleting about:', error);
+      showSnackbar('Failed to delete about entry.', 'error');
     }
   };
   const [listItemModalOpen, setListItemModalOpen] = useState(false);
@@ -220,6 +235,17 @@ const AboutsTable = () => {
     setListItems(updatedListItems);
     handleCloseListItemModal();
   };
+
+  const showSnackbar = (message, severity) => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setSnackbarOpen(true);
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
+
 
 
   return (
@@ -649,13 +675,28 @@ const AboutsTable = () => {
               form="aboutForm"
               variant="contained"
               color="primary"
-              startIcon={editAbout ? <Edit /> : <Add />}
+              startIcon={isSubmitting ? <CircularProgress size={16} color="inherit" /> : editAbout ? <Edit /> : <Add />}
+              disabled={isSubmitting}
             >
-              {editAbout ? 'Update' : 'Create'}
+               {isSubmitting ? 'Submitting...' : editAbout ? 'Update' : 'Create'}
             </Button>
           </Box>
         </Box>
       </Modal>
+
+
+      {/* Snackbar */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={4000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
+
 
       {/* Dialog for Delete Confirmation */}
       <Dialog open={dialogOpen} onClose={handleCloseDialog}>

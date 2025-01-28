@@ -5,7 +5,6 @@ async function createWorkCategoriesTable() {
     CREATE TABLE IF NOT EXISTS work_categories (
       id INT AUTO_INCREMENT PRIMARY KEY,
       category VARCHAR(255) NOT NULL,
-      img VARCHAR(255) NOT NULL,
       title VARCHAR(255) NOT NULL,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP

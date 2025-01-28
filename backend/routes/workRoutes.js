@@ -6,11 +6,13 @@ const {
   createWork,
   updateWork,
   deleteWork,
+  getProject
 } = require('../controllers/workController');
 
 const router = express.Router();
 
 router.get('/', getAllWorks);
+router.get('/project', getProject);
 router.get('/:id', getWorkById);
 
 router.post(

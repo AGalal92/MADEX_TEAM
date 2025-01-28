@@ -2,6 +2,19 @@ const pool = require('../db'); // Assuming you have db.js for MySQL connection
 const fs = require('fs'); // For file deletion
 const path = require('path'); // For file paths
 
+// Get specific fields (project details)
+const getProject = async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      'SELECT id, image, video, work_category_id FROM works'
+    );
+    res.json(rows);
+  } catch (error) {
+    console.error('Error fetching project details:', error.message);
+    res.status(500).json({ message: 'Error fetching project details', error: error.message });
+  }
+};
+
 // Get all works
 const getAllWorks = async (req, res) => {
   try {
@@ -19,24 +32,7 @@ const getWorkById = async (req, res) => {
     const { id } = req.params;
     const [rows] = await pool.query('SELECT * FROM works WHERE id = ?', [id]);
 
-    if (rows.length === 0) {
-      return res.status(404).json({ message: 'Work not found' });
-    }
-
-    // Parse slider_images from JSON string to array
-    const work = {
-      ...rows[0],
-      slider_images: (() => {
-        try {
-          return JSON.parse(rows[0].slider_images || '[]'); // Safely parse slider_images
-        } catch (error) {
-          console.error('Error parsing slider_images:', error.message);
-          return []; // Default to empty array on error
-        }
-      })(),
-    };
-
-    res.json(work);
+    res.json(rows);
   } catch (error) {
     console.error('Error fetching work:', error.message);
     res.status(500).json({ message: 'Error fetching work', error: error.message });
@@ -132,16 +128,21 @@ const updateWork = async (req, res) => {
     } = req.body;
       console.log("🚀 ~ updateWork ~ bodySliderImages:", slider_images)
 
-    // Handle slider images
-    let combinedSliderImages = [];
-   
-    // 2. Check if slider images are provided as uploaded files
-    if (req.files?.slider_images) {
-      const uploadedImages = req.files.slider_images.map(file => file.filename);
-      combinedSliderImages = [slider_images, ...uploadedImages];
-    }
+      let combinedSliderImages;
+      if (req.files?.slider_images) {
+        // Combine existing and uploaded slider images
+        const uploadedImages = req.files.slider_images.map(file => file.filename);
+        combinedSliderImages = [
+          ...(Array.isArray(slider_images) ? slider_images : JSON.parse(slider_images || '[]')),
+          ...uploadedImages,
+        ];
+      } else {
+        // Retain existing images if no new files are uploaded
+        combinedSliderImages = Array.isArray(slider_images)
+          ? slider_images
+          : JSON.parse(slider_images || '[]');
+      }
 
-    console.log('Final slider images:', combinedSliderImages);
 
     // Handle other file uploads (keep existing implementation)
     const image = req.files?.image?.[0]?.filename || existingWork.image;
@@ -250,4 +251,5 @@ module.exports = {
   createWork,
   updateWork,
   deleteWork,
+  getProject
 };

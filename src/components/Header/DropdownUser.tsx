@@ -20,14 +20,14 @@ const DropdownUser = () => {
         className="flex items-center gap-4"
         href="#"
       >
-        <span className="hidden text-right lg:block">
+        {/* <span className="hidden text-right lg:block">
           <span className="block text-sm font-medium text-black dark:text-white">
             Thomas Anree
           </span>
           <span className="block text-xs">UX Designer</span>
-        </span>
+        </span> */}
 
-        <span className="h-12 w-12 rounded-full">
+        {/* <span className="h-12 w-12 rounded-full">
           <Image
             width={112}
             height={112}
@@ -38,7 +38,7 @@ const DropdownUser = () => {
             }}
             alt="User"
           />
-        </span>
+        </span> */}
 
         <svg
           className="hidden fill-current sm:block"
@@ -62,7 +62,7 @@ const DropdownUser = () => {
         <div
           className={`absolute right-0 mt-4 flex w-62.5 flex-col rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark`}
         >
-          <ul className="flex flex-col gap-5 border-b border-stroke px-6 py-7.5 dark:border-strokedark">
+          {/* <ul className="flex flex-col gap-5 border-b border-stroke px-6 py-7.5 dark:border-strokedark">
             <li>
               <Link
                 href="/services"
@@ -134,7 +134,7 @@ const DropdownUser = () => {
                 Account Settings
               </Link>
             </li>
-          </ul>
+          </ul> */}
           <button onClick={handleSignOut} className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base">
             <svg
               className="fill-current"
