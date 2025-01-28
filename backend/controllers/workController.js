@@ -3,30 +3,15 @@ const fs = require('fs'); // For file deletion
 const path = require('path'); // For file paths
 
 // Get all works
-// Get all works
 const getAllWorks = async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT * FROM works');
-    // Parse slider_images from JSON string to array
-    const works = rows.map((work) => {
-      try {
-        return {
-          ...work,
-          slider_images: JSON.parse(work.slider_images || '[]'), // Default to empty array if parsing fails
-        };
-      } catch (error) {
-        console.error('Error parsing slider_images:', error.message);
-        return {
-          ...work,
-          slider_images: [], // Default to empty array if parsing fails
-        };
-      }
-    });
-    res.json(works);
+    res.json(rows);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching works', error: error.message });
   }
 };
+
 
 // Get a single work by ID
 const getWorkById = async (req, res) => {
@@ -39,25 +24,26 @@ const getWorkById = async (req, res) => {
     }
 
     // Parse slider_images from JSON string to array
-    let sliderImages = [];
-    try {
-      sliderImages = JSON.parse(rows[0].slider_images || '[]');
-    } catch (error) {
-      console.error('Error parsing slider_images:', error.message);
-    }
-
     const work = {
       ...rows[0],
-      slider_images: sliderImages,
+      slider_images: (() => {
+        try {
+          return JSON.parse(rows[0].slider_images || '[]'); // Safely parse slider_images
+        } catch (error) {
+          console.error('Error parsing slider_images:', error.message);
+          return []; // Default to empty array on error
+        }
+      })(),
     };
 
     res.json(work);
   } catch (error) {
+    console.error('Error fetching work:', error.message);
     res.status(500).json({ message: 'Error fetching work', error: error.message });
   }
 };
 
-// Create a new work
+
 // Create a new work
 const createWork = async (req, res) => {
   try {
@@ -68,63 +54,111 @@ const createWork = async (req, res) => {
       return res.status(400).json({ message: 'Title, slug, and work_category_id are required' });
     }
 
-    // Handle single files
-    const image = req.files?.image ? req.files.image[0].filename : null;
-    const video = req.files?.video ? req.files.video[0].filename : null;
-    const imageBefore = req.files?.image_before ? req.files.image_before[0].filename : null;
-    const imageAfter = req.files?.image_after ? req.files.image_after[0].filename : null;
+    // Handle slider_images uploads
+    let sliderImages = [];
+    try {
+      sliderImages = req.files?.slider_images
+        ? req.files.slider_images.map((file) => file.filename) // Map filenames from uploaded files
+        : [];
+    } catch (err) {
+      console.error('Error handling slider_images:', err.message);
+      return res.status(400).json({ message: 'Error handling slider_images', error: err.message });
+    }
 
-    // Handle multiple slider images
-    const slider_images = req.files?.slider_images
-      ? req.files.slider_images.map((file) => file.filename)
-      : [];
+    // Handle other file uploads
+    const image = req.files?.image?.[0]?.filename || null;
+    const video = req.files?.video?.[0]?.filename || null;
+    const imageBefore = req.files?.image_before?.[0]?.filename || null;
+    const imageAfter = req.files?.image_after?.[0]?.filename || null;
 
+    // Insert data into the database
     const query = `
       INSERT INTO works (title, slug, image, video, slider_images, image_before, image_after, work_category_id)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `;
-    await pool.query(query, [
+    const [result] = await pool.query(query, [
       title,
       slug,
       image,
       video,
-      JSON.stringify(slider_images), // Ensure valid JSON string
+      JSON.stringify(sliderImages), // Store slider images as a JSON string
       imageBefore,
       imageAfter,
       work_category_id,
     ]);
 
-    res.status(201).json({ message: 'Work created successfully!' });
+    console.log('New Work Created:', { id: result.insertId, title, slug, sliderImages });
+
+    res.status(201).json({
+      message: 'Work created successfully!',
+      work: {
+        id: result.insertId,
+        title,
+        slug,
+        image,
+        video,
+        slider_images: sliderImages,
+        image_before: imageBefore,
+        image_after: imageAfter,
+        work_category_id,
+      },
+    });
   } catch (error) {
+    console.error('Error creating work:', error.message);
     res.status(500).json({ message: 'Error creating work', error: error.message });
   }
 };
+
 
 // Update a work
 const updateWork = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, slug, work_category_id } = req.body;
 
-    // Validate required fields
-    if (!title || !slug || !work_category_id) {
-      return res.status(400).json({ message: 'Title, slug, and work_category_id are required' });
+    // Fetch existing work data
+    const [rows] = await pool.query('SELECT * FROM works WHERE id = ?', [id]);
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'Work not found' });
     }
 
-    // Handle single files
-    const image = req.files?.image ? req.files.image[0].filename : null;
-    const video = req.files?.video ? req.files.video[0].filename : null;
-    const imageBefore = req.files?.image_before ? req.files.image_before[0].filename : null;
-    const imageAfter = req.files?.image_after ? req.files.image_after[0].filename : null;
+    const existingWork = rows[0];
 
-    // Handle multiple slider images
-    const slider_images = req.files?.slider_images
-      ? req.files.slider_images.map((file) => file.filename)
-      : [];
+    // Extract fields from the request body
+    const {
+      title = existingWork.title,
+      slug = existingWork.slug,
+      work_category_id = existingWork.work_category_id,
+      slider_images = existingWork.slider_images, // Get slider images from request body
+    } = req.body;
+      console.log("🚀 ~ updateWork ~ bodySliderImages:", slider_images)
 
+    // Handle slider images
+    let combinedSliderImages = [];
+   
+    // 2. Check if slider images are provided as uploaded files
+    if (req.files?.slider_images) {
+      const uploadedImages = req.files.slider_images.map(file => file.filename);
+      combinedSliderImages = [slider_images, ...uploadedImages];
+    }
+
+    console.log('Final slider images:', combinedSliderImages);
+
+    // Handle other file uploads (keep existing implementation)
+    const image = req.files?.image?.[0]?.filename || existingWork.image;
+    const video = req.files?.video?.[0]?.filename || existingWork.video;
+    const imageBefore = req.files?.image_before?.[0]?.filename || existingWork.image_before;
+    const imageAfter = req.files?.image_after?.[0]?.filename || existingWork.image_after;
+
+    // Update database
     const query = `
       UPDATE works
-      SET title = ?, slug = ?, image = ?, video = ?, slider_images = ?, image_before = ?, image_after = ?, work_category_id = ?
+      SET title = ?, slug = ?, 
+          image = ?, 
+          video = ?, 
+          slider_images = ?, 
+          image_before = ?, 
+          image_after = ?, 
+          work_category_id = ?
       WHERE id = ?
     `;
     await pool.query(query, [
@@ -132,18 +166,27 @@ const updateWork = async (req, res) => {
       slug,
       image,
       video,
-      JSON.stringify(slider_images), // Save as JSON string
+      JSON.stringify(combinedSliderImages),
       imageBefore,
       imageAfter,
       work_category_id,
       id,
     ]);
 
-    res.json({ message: 'Work updated successfully!' });
+    res.json({ 
+      message: 'Work updated successfully!',
+      slider_images: combinedSliderImages 
+    });
+    
   } catch (error) {
+    console.error('Error updating work:', error);
     res.status(500).json({ message: 'Error updating work', error: error.message });
   }
 };
+
+
+
+
 
 // Delete a work
 const deleteWork = async (req, res) => {
@@ -170,7 +213,12 @@ const deleteWork = async (req, res) => {
       }
 
       // Delete slider images
-      const sliderImages = JSON.parse(slider_images || '[]');
+      let sliderImages = [];
+      try {
+        sliderImages = JSON.parse(slider_images || '[]');
+      } catch (error) {
+        console.error('Error parsing slider_images:', error.message);
+      }
       sliderImages.forEach((sliderImage) => {
         fs.unlinkSync(path.join(__dirname, '../storage', sliderImage));
       });
@@ -191,6 +239,7 @@ const deleteWork = async (req, res) => {
 
     res.json({ message: 'Work deleted successfully!' });
   } catch (error) {
+    console.error('Error in deleteWork:', error);
     res.status(500).json({ message: 'Error deleting work', error: error.message });
   }
 };

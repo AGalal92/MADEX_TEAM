@@ -2,9 +2,45 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import Slider from 'react-slick';
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
 
 export default function Features({ services }) {
   const [activeTab, setActiveTab] = useState(services?.[0]?.id || ''); // Set the first service's ID as the default active tab
+
+  // Slider settings
+  const sliderSettings = {
+    dots: false, // Hide dots
+    infinite: true, // Infinite loop
+    speed: 500, // Transition speed
+    slidesToShow: 4, // Number of tabs to show at once
+    slidesToScroll: 1, // Number of tabs to scroll
+    swipeToSlide: true, // Enable swiping
+    draggable: true, // Enable dragging
+    responsive: [
+      {
+        breakpoint: 1024, // Adjust for smaller screens (e.g., tablets)
+        settings: {
+          slidesToShow: 3, // Show 3 tabs on tablets
+        },
+      },
+      {
+        breakpoint: 768, // Adjust for smaller tablets
+        settings: {
+          slidesToShow: 2, // Show 2 tabs on smaller tablets
+        },
+      },
+      {
+        breakpoint: 480, // Adjust for mobile devices
+        settings: {
+          slidesToShow: 1, // Show 1 tab on mobile
+          centerMode: true, // Center the active tab
+          centerPadding: '20px', // Add padding to the sides
+        },
+      },
+    ],
+  };
 
   return (
     <section id="services" className="features section dark-background">
@@ -14,14 +50,9 @@ export default function Features({ services }) {
       </div>
       <div className="container">
         {/* Tabs Navigation */}
-        <ul
-          className="nav nav-tabs row d-flex aos-init aos-animate"
-          data-aos="fade-up"
-          data-aos-delay="100"
-          role="tablist"
-        >
+        <Slider {...sliderSettings} className="nav-tabs-slider">
           {services.map((service) => (
-            <li key={service.id} className="nav-item col-3" role="presentation">
+            <div key={service.id} className="nav-item" role="presentation">
               <button
                 className={`nav-link ${activeTab === service.id ? 'active show' : ''}`}
                 onClick={() => setActiveTab(service.id)}
@@ -48,10 +79,9 @@ export default function Features({ services }) {
                   {service.title}
                 </h4>
               </button>
-
-            </li>
+            </div>
           ))}
-        </ul>
+        </Slider>
 
         {/* Tabs Content */}
         <div
@@ -82,11 +112,15 @@ export default function Features({ services }) {
                 </div>
                 <div className="col-lg-6 order-1 order-lg-2 text-center">
                   <Image
-                    src={service.image}
+                    src={`http://localhost:5001/storage/${service.image}`} // Construct the full image URL
                     alt={service.title}
                     width={600}
                     height={400}
                     className="img-fluid"
+                    onError={(e) => {
+                      e.target.onerror = null; // Prevent infinite error loop
+                      e.target.src = '/default-image.png'; // Fallback image in case of error
+                    }}
                   />
                 </div>
               </div>

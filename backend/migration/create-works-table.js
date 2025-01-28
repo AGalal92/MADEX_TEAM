@@ -12,9 +12,9 @@ async function createWorksTable() {
       image_before VARCHAR(255) NULL,
       image_after VARCHAR(255) NULL,
       work_category_id INT NOT NULL,
+      FOREIGN KEY (work_category_id) REFERENCES work_categories(id) ON DELETE CASCADE
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      FOREIGN KEY (work_category_id) REFERENCES work_categories(id) ON DELETE CASCADE
     );
   `;
 

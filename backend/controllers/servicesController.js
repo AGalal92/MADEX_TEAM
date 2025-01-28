@@ -4,11 +4,13 @@ const pool = require('../db'); // Assuming db.js exports the MySQL pool
 const getAllServices = async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT * FROM services');
-    res.json(rows);
+    res.json(rows); // Correctly returns JSON
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching services', error: error.message });
+    res.status(500).json({ message: 'Error fetching services', error: error.message }); // JSON error response
   }
 };
+
+
 
 // Get a single service by ID
 const getServiceById = async (req, res) => {
@@ -20,45 +22,28 @@ const getServiceById = async (req, res) => {
       return res.status(404).json({ message: 'Service not found' });
     }
 
-    res.json(rows[0]);
+    const service = { ...rows[0], list_items: JSON.parse(rows[0].list_items || '[]') };
+
+    res.json(service);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching service', error: error.message });
   }
 };
 
+
 // Create a new service
 const createService = async (req, res) => {
   try {
-    const { title, icon, heading, description, paragraph } = req.body;
+    const { title, icon, heading, description, paragraph, list_items } = req.body;
 
     const image = req.files?.image ? req.files.image[0].filename : null;
-    const list_items = req.body.list_items ? JSON.stringify(req.body.list_items) : '[]';
+
+   // Parse list_items and ensure it's an array
+   const sanitizedListItems = list_items ? JSON.parse(list_items) : [];
 
     const query = `
       INSERT INTO services (title, icon, image, heading, description, list_items, paragraph)
       VALUES (?, ?, ?, ?, ?, ?, ?)
-    `;
-    await pool.query(query, [title, icon, image, heading, description, list_items, paragraph]);
-
-    res.status(201).json({ message: 'Service created successfully!' });
-  } catch (error) {
-    res.status(500).json({ message: 'Error creating service', error: error.message });
-  }
-};
-
-// Update a service
-const updateService = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { title, icon, heading, description, paragraph } = req.body;
-
-    const image = req.files?.image ? req.files.image[0].filename : null;
-    const list_items = req.body.list_items ? JSON.stringify(req.body.list_items) : '[]';
-
-    const query = `
-      UPDATE services
-      SET title = ?, icon = ?, image = ?, heading = ?, description = ?, list_items = ?, paragraph = ?
-      WHERE id = ?
     `;
     await pool.query(query, [
       title,
@@ -66,7 +51,61 @@ const updateService = async (req, res) => {
       image,
       heading,
       description,
-      list_items,
+      JSON.stringify(sanitizedListItems), // Save as JSON array in the database
+      paragraph,
+    ]);
+
+    res.status(201).json({ message: 'Service created successfully!' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error creating service', error: error.message });
+  }
+};
+
+
+// Update a service
+const updateService = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Fetch existing service data
+    const [rows] = await pool.query('SELECT * FROM services WHERE id = ?', [id]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'Service not found' });
+    }
+
+    const existingService = rows[0];
+
+    // Extract updated fields from the request body
+    const {
+      title = existingService.title,
+      icon = existingService.icon,
+      heading = existingService.heading,
+      description = existingService.description,
+      paragraph = existingService.paragraph,
+      list_items = JSON.parse(existingService.list_items || '[]'),
+    } = req.body;
+
+    // Handle the `list_items` field
+    const sanitizedListItems = Array.isArray(list_items) ? list_items : JSON.parse(list_items);
+
+    // Handle image field, only update if a new file is uploaded
+    const image = req.files?.image ? req.files.image[0].filename : existingService.image;
+
+    // Update query with merged values
+    const query = `
+      UPDATE services
+      SET title = ?, icon = ?, image = ?, heading = ?, description = ?, list_items = ?, paragraph = ?
+      WHERE id = ?
+    `;
+
+    await pool.query(query, [
+      title,
+      icon,
+      image,
+      heading,
+      description,
+      JSON.stringify(sanitizedListItems),
       paragraph,
       id,
     ]);
@@ -76,6 +115,9 @@ const updateService = async (req, res) => {
     res.status(500).json({ message: 'Error updating service', error: error.message });
   }
 };
+
+
+
 
 // Delete a service
 const deleteService = async (req, res) => {
