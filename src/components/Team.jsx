@@ -38,7 +38,7 @@ const Team = ({ team }) => {
                 data-aos-delay={100 * member.id}
               >
                 <div className="member">
-                  <div className="pic">
+                  <div className="pic ml-1">
                     <Image
                       src={`${STORAGE_BASE_URL}/${member.image}`} // Construct the full image URL
                       alt={member.name}

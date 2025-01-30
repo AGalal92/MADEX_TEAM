@@ -17,6 +17,7 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { useParams } from 'next/navigation';
 import WorksHeader from '@/components/WorksHeader';
+import Image from 'next/image';
 
 const STORAGE_BASE_URL = 'http://localhost:5001/storage';
 
@@ -203,7 +204,7 @@ export default function WorkDetails() {
                         transition={{ duration: 0.3 }}
                         style={{ height: '100%', width: '100%' }}
                       >
-                        <img
+                        <Image
                           src={`${STORAGE_BASE_URL}/${work.slider_images[currentSlide]}`}
                           alt={`Slide ${currentSlide + 1}`}
                           style={{ 
@@ -296,7 +297,7 @@ export default function WorkDetails() {
                   }}
                   onMouseMove={handleBeforeAfterSlider}
                 >
-                 <img
+                 <Image
                     src={`${STORAGE_BASE_URL}/${work.image_before}`}
                     alt="Before"
                     style={{
@@ -314,7 +315,7 @@ export default function WorkDetails() {
                       clipPath: `polygon(${beforeAfterPosition}% 0, 100% 0, 100% 100%, ${beforeAfterPosition}% 100%)`,
                     }}
                   >
-                    <img
+                    <Image
                       src={`${STORAGE_BASE_URL}/${work.image_after}`}
                       alt="After"
                       style={{

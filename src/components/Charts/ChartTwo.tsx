@@ -59,9 +59,6 @@ const options: ApexOptions = {
     fontWeight: 500,
     fontSize: "14px",
 
-    markers: {
-      radius: 99,
-    },
   },
   fill: {
     opacity: 1,
@@ -97,18 +94,7 @@ const ChartTwo: React.FC = () => {
         </div>
         <div>
           <div className="relative z-20 inline-block">
-            <select
-              name="#"
-              id="#"
-              className="relative z-20 inline-flex appearance-none bg-transparent py-1 pl-3 pr-8 text-sm font-medium outline-none"
-            >
-              <option value="" className="dark:bg-boxdark">
-                This Week
-              </option>
-              <option value="" className="dark:bg-boxdark">
-                Last Week
-              </option>
-            </select>
+           
             <span className="absolute right-3 top-1/2 z-10 -translate-y-1/2">
               <svg
                 width="10"

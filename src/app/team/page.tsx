@@ -28,6 +28,7 @@ import {
 } from '@mui/material';
 import { Edit, Delete, Add, Close } from '@mui/icons-material';
 import axios from 'axios';
+import Image from 'next/image';
 
 const TeamTable = () => {
   const [teamMembers, setTeamMembers] = useState([]);
@@ -220,7 +221,7 @@ const TeamTable = () => {
               {teamMembers.map((member) => (
                 <TableRow key={member.id} sx={{ '&:nth-of-type(odd)': { backgroundColor: 'action.hover' } }}>
                   <TableCell>
-                    <img
+                    <Image
                       src={`${STORAGE_BASE_URL}/${member.image}`}
                       alt={member.name}
                       style={{ width: 50, height: 50, borderRadius: '50%' }}
@@ -340,7 +341,7 @@ const TeamTable = () => {
                       </Button>
                       {imagePreview && (
                         <Box mt={2} sx={{ position: 'relative' }}>
-                          <img
+                          <Image
                             src={imagePreview}
                             alt="Preview"
                             style={{

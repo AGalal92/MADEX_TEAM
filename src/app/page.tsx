@@ -1,7 +1,7 @@
 'use client';
 import DashboardHeader from '../components/DashboardHeader';
 import Hero from '../components/Hero';
-import About from '../components/About';
+import About from '../components/About.jsx';
 import Stats from '../components/Stats';
 import FeaturedServices from '../components/FeaturedServices';
 import Clients from '../components/Clients';

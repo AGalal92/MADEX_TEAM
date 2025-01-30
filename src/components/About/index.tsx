@@ -29,6 +29,7 @@ import {
 } from '@mui/material';
 import { Edit, Delete, Add, Close } from '@mui/icons-material';
 import axios from 'axios';
+import Image from 'next/image';
 
 const AboutsTable = () => {
   const [abouts, setAbouts] = useState([]);
@@ -564,7 +565,7 @@ const AboutsTable = () => {
                     </Button>
                     {img1Preview && (
                       <Box mt={2} sx={{ position: 'relative' }}>
-                        <img
+                        <Image
                           src={img1Preview}
                           alt="Preview 1"
                           style={{
@@ -617,7 +618,7 @@ const AboutsTable = () => {
                     </Button>
                     {img2Preview && (
                       <Box mt={2} sx={{ position: 'relative' }}>
-                        <img
+                        <Image
                           src={img2Preview}
                           alt="Preview 2"
                           style={{

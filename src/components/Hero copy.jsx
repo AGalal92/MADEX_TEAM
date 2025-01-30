@@ -4,6 +4,7 @@ import { Autoplay, Pagination } from 'swiper/modules';
 import 'swiper/swiper-bundle.css';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
+import Image from 'next/image';
 
 const PortfolioDetails = () => {
   // Initialize AOS (Animate on Scroll)
@@ -34,16 +35,16 @@ const PortfolioDetails = () => {
               className="portfolio-details-slider"
             >
               <SwiperSlide>
-                <img src="/assets/images/product-1.jpg" alt="Product 1" />
+                <Image src="/assets/images/product-1.jpg" alt="Product 1" />
               </SwiperSlide>
               <SwiperSlide>
-                <img src="/assets/images/product-2.jpg" alt="Branding 1" />
+                <Image src="/assets/images/product-2.jpg" alt="Branding 1" />
               </SwiperSlide>
               <SwiperSlide>
-                <img src="/assets/images/product-3.jpg" alt="Books 1" />
+                <Image src="/assets/images/product-3.jpg" alt="Books 1" />
               </SwiperSlide>
               <SwiperSlide>
-                <img src="/assets/images/product-4.jpg" alt="App 1" />
+                <Image src="/assets/images/product-4.jpg" alt="App 1" />
               </SwiperSlide>
             </Swiper>
           </div>

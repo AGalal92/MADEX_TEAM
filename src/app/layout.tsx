@@ -35,7 +35,14 @@ export default function RootLayout({
   }, []);
 
   return (
-    <html lang="en">
+    <html title="Home" lang="en">
+        <head>
+        <title>Madex Team</title>
+        <meta
+          name="description"
+          content="This is the website of madex team portfolio"
+        />
+      </head>
       <body
         className={`${GeistSans.variable} ${GeistMono.variable} antialiased`}
         suppressHydrationWarning={true}

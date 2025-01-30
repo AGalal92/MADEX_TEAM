@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Snackbar, Alert } from '@mui/material';
 
-export default function Contact() {
+export default function Contact({contact}) {
   const contactData = {
     sectionTitle: {
       title: "Contact",

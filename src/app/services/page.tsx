@@ -30,6 +30,8 @@ import {
 } from '@mui/material';
 import { Edit, Delete, Add, Close } from '@mui/icons-material';
 import axios from 'axios';
+import Image from 'next/image';
+
 
 const ServicesTable = () => {
   const [services, setServices] = useState([]);
@@ -509,7 +511,7 @@ const ServicesTable = () => {
                       </Button>
                       {imagePreview && (
                         <Box mt={2} sx={{ position: 'relative' }}>
-                          <img
+                          <Image
                             src={imagePreview}
                             alt="Preview"
                             style={{

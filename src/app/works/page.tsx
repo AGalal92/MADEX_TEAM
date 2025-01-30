@@ -34,7 +34,7 @@ import {
 } from '@mui/material';
 import { Edit, Delete, Add, Close } from '@mui/icons-material';
 import axios from 'axios';
-
+import Image from 'next/image';
 
 const WorksTable = () => {
   const [works, setWorks] = useState([]);
@@ -146,7 +146,7 @@ const WorksTable = () => {
             slider_images: [...prev.slider_images, e.target.result]
           }));
         };
-        reader.readAsDataURL(file);
+        reader.readAsDataURL(file as any);
       });
     } else {
       const file = newFiles[0];
@@ -470,7 +470,7 @@ const WorksTable = () => {
                                 }}
                               />
                             ) : (
-                              <img
+                              <Image
                                 src={previews[field]}
                                 alt={field}
                                 style={{
@@ -559,7 +559,7 @@ const WorksTable = () => {
                                 p: 0.5
                               }}
                             >
-                              <img
+                              <Image
                                 src={imageUrl}
                                 alt={`Slider ${index}`}
                                 style={{
