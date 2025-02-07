@@ -50,9 +50,14 @@ const Team = ({ team }) => {
                     <h4>{member.name}</h4>
                     <span>{member.position}</span>
                     <div className="social">
-                      {socialLinks.map((link, index) => (
+                      {/* {socialLinks.map((link, index) => (
                         <a key={index} href={link.url} target="_blank" rel="noopener noreferrer">
                           <i className={link.icon}></i>
+                        </a>
+                      ))} */}
+                        {member.social_links.map((link, index) => (
+                        <a key={index} href={link.url} target="_blank" rel="noopener noreferrer">
+                          <i className={`bi ${link.icon}`} style={{ fontSize: '1.2rem', marginRight: '8px' }}></i>
                         </a>
                       ))}
                     </div>

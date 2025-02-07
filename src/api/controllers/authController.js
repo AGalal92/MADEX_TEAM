@@ -1,7 +1,10 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-
+const dotenv = require('dotenv');
+const path = require('path');
+// Ensure .env is loaded from root directory
+dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
 // Register a new user
 const register = async (req, res) => {
   try {
@@ -42,6 +45,8 @@ const login = async (req, res) => {
 
     // Generate JWT Token
     const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    // const token = jwt.sign({ id: user._id, email: user.email }, '6ff4b29191a894526bbb761cff75920d2c223bed1fac624d009c06a5fa144e6d', { expiresIn: '1h' });
+
 
     res.json({ message: 'Login successful!', token, user });
   } catch (error) {
