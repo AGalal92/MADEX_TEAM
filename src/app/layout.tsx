@@ -20,13 +20,11 @@ export default function RootLayout({
   const { isAuthenticated: authenticated } = useAuthStore(); // Use global state
   const [loading, setLoading] = useState(true);
   const authLayout = useAuthLayout(); // Use the custom hook to get authLayout value
-  console.log("🚀 ~ authLayout:", authLayout)
 
   // Check authentication status on mount
   useEffect(() => {
     const checkAuth = async () => {
       const authStatus = await isAuthenticated();
-      console.log("Auth Status:", authStatus); // Verify the auth status
       useAuthStore.getState().setAuth(authStatus); // Update global state
       setLoading(false);
     };

@@ -2,7 +2,6 @@ import React from 'react';
 import Image from 'next/image';
 
 const Team = ({ team }) => {
-  console.log("🚀 ~ Team ~ team:", team);
 
   const STORAGE_BASE_URL = 'http://localhost:5001/storage'; // Base URL for the images
 

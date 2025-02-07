@@ -11,8 +11,8 @@ export const useAllData = () => {
   const { data: contactData, loading: contactLoading, error: contactError } = useCrud('contact-us');
 // Extract the project data from worksData (filter or map logic)
 const workProjectData = worksData
-? worksData.map(({ id, image, video, work_category_id }) => ({
-    id,
+? worksData.map(({ _id, image, video, work_category_id }) => ({
+    id : _id,
     image,
     video,
     categoryId: work_category_id,

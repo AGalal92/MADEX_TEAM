@@ -1,12 +1,12 @@
-const fs = require('fs'); // Import the file system module
-const path = require('path'); // Import the path module
-const pool = require('../db'); // Assuming db.js exports the MySQL pool
+const Team = require('../models/Team');
+const path = require('path');
+const fs = require('fs');
 
 // Get all team members
 const getAllTeamMembers = async (req, res) => {
   try {
-    const [rows] = await pool.query('SELECT * FROM team');
-    res.json(rows);
+    const team = await Team.find();
+    res.json(team);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching team members', error: error.message });
   }
@@ -16,13 +16,13 @@ const getAllTeamMembers = async (req, res) => {
 const getTeamMemberById = async (req, res) => {
   try {
     const { id } = req.params;
-    const [rows] = await pool.query('SELECT * FROM team WHERE id = ?', [id]);
+    const member = await Team.findById(id);
 
-    if (rows.length === 0) {
+    if (!member) {
       return res.status(404).json({ message: 'Team member not found' });
     }
 
-    res.json(rows[0]);
+    res.json(member);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching team member', error: error.message });
   }
@@ -35,13 +35,28 @@ const createTeamMember = async (req, res) => {
 
     const image = req.files?.image ? req.files.image[0].filename : null;
 
-    const query = `
-      INSERT INTO team (image, name, position, social_links)
-      VALUES (?, ?, ?, ?)
-    `;
-    await pool.query(query, [image, name, position, JSON.stringify(social_links)]);
+    // Ensure social_links is always an array
+    let sanitizedSocialLinks = [];
+    if (social_links) {
+      try {
+        sanitizedSocialLinks = JSON.parse(social_links);
+        if (!Array.isArray(sanitizedSocialLinks)) {
+          throw new Error('social_links must be an array');
+        }
+      } catch (error) {
+        return res.status(400).json({ message: 'Invalid social_links format. Must be a JSON array.' });
+      }
+    }
 
-    res.status(201).json({ message: 'Team member created successfully!' });
+    const member = new Team({
+      name,
+      position,
+      social_links: sanitizedSocialLinks,
+      image,
+    });
+
+    await member.save();
+    res.status(201).json({ message: 'Team member created successfully!', member });
   } catch (error) {
     res.status(500).json({ message: 'Error creating team member', error: error.message });
   }
@@ -51,18 +66,30 @@ const createTeamMember = async (req, res) => {
 const updateTeamMember = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, position, social_links } = req.body;
+    let updates = { ...req.body };
 
-    const image = req.files?.image ? req.files.image[0].filename : null;
+    if (updates.social_links) {
+      try {
+        updates.social_links = JSON.parse(updates.social_links);
+        if (!Array.isArray(updates.social_links)) {
+          throw new Error('social_links must be an array');
+        }
+      } catch (error) {
+        return res.status(400).json({ message: 'Invalid social_links format. Must be a JSON array.' });
+      }
+    }
 
-    const query = `
-      UPDATE team
-      SET image = ?, name = ?, position = ?, social_links = ?
-      WHERE id = ?
-    `;
-    await pool.query(query, [image, name, position, JSON.stringify(social_links), id]);
+    if (req.files?.image) {
+      updates.image = req.files.image[0].filename;
+    }
 
-    res.json({ message: 'Team member updated successfully!' });
+    const member = await Team.findByIdAndUpdate(id, updates, { new: true });
+
+    if (!member) {
+      return res.status(404).json({ message: 'Team member not found' });
+    }
+
+    res.json({ message: 'Team member updated successfully!', member });
   } catch (error) {
     res.status(500).json({ message: 'Error updating team member', error: error.message });
   }
@@ -73,14 +100,14 @@ const deleteTeamMember = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const [rows] = await pool.query('SELECT image FROM team WHERE id = ?', [id]);
-
-    if (rows.length > 0 && rows[0].image) {
-      fs.unlinkSync(path.join(__dirname, '../storage', rows[0].image));
+    const member = await Team.findById(id);
+    if (!member) {
+      return res.status(404).json({ message: 'Team member not found' });
     }
 
-    await pool.query('DELETE FROM team WHERE id = ?', [id]);
+    if (member.image) fs.unlinkSync(path.join(__dirname, '../storage', member.image));
 
+    await Team.findByIdAndDelete(id);
     res.json({ message: 'Team member deleted successfully!' });
   } catch (error) {
     res.status(500).json({ message: 'Error deleting team member', error: error.message });

@@ -1,12 +1,10 @@
-const fs = require('fs'); // Import the file system module
-const path = require('path'); // Import the path module
-const pool = require('../db'); // Assuming you have db.js for MySQL connection
+const WorkCategory = require('../models/WorkCategory');
 
 // Get all work categories
 const getAllCategories = async (req, res) => {
   try {
-    const [rows] = await pool.query('SELECT * FROM work_categories');
-    res.json(rows);
+    const categories = await WorkCategory.find();
+    res.json(categories);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching categories', error: error.message });
   }
@@ -16,13 +14,13 @@ const getAllCategories = async (req, res) => {
 const getCategoryById = async (req, res) => {
   try {
     const { id } = req.params;
-    const [rows] = await pool.query('SELECT * FROM work_categories WHERE id = ?', [id]);
+    const category = await WorkCategory.findById(id);
 
-    if (rows.length === 0) {
+    if (!category) {
       return res.status(404).json({ message: 'Category not found' });
     }
 
-    res.json(rows[0]);
+    res.json(category);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching category', error: error.message });
   }
@@ -33,10 +31,10 @@ const createCategory = async (req, res) => {
   try {
     const { category, title } = req.body;
 
-    const query = 'INSERT INTO work_categories (category, title) VALUES (?, ?)';
-    await pool.query(query, [category, title]);
+    const newCategory = new WorkCategory({ category, title });
+    await newCategory.save();
 
-    res.status(201).json({ message: 'Category created successfully!' });
+    res.status(201).json({ message: 'Category created successfully!', newCategory });
   } catch (error) {
     res.status(500).json({ message: 'Error creating category', error: error.message });
   }
@@ -46,18 +44,15 @@ const createCategory = async (req, res) => {
 const updateCategory = async (req, res) => {
   try {
     const { id } = req.params;
-    const { category, title } = req.body;
+    const updates = req.body;
 
-    const [rows] = await pool.query('SELECT * FROM work_categories WHERE id = ?', [id]);
+    const updatedCategory = await WorkCategory.findByIdAndUpdate(id, updates, { new: true });
 
-    if (rows.length === 0) {
+    if (!updatedCategory) {
       return res.status(404).json({ message: 'Category not found' });
     }
 
-    const query = 'UPDATE work_categories SET category = ?, title = ? WHERE id = ?';
-    await pool.query(query, [category, title, id]);
-
-    res.json({ message: 'Category updated successfully!' });
+    res.json({ message: 'Category updated successfully!', updatedCategory });
   } catch (error) {
     res.status(500).json({ message: 'Error updating category', error: error.message });
   }
@@ -68,14 +63,11 @@ const deleteCategory = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const [rows] = await pool.query('SELECT * FROM work_categories WHERE id = ?', [id]);
+    const deletedCategory = await WorkCategory.findByIdAndDelete(id);
 
-    if (rows.length === 0) {
+    if (!deletedCategory) {
       return res.status(404).json({ message: 'Category not found' });
     }
-
-    const query = 'DELETE FROM work_categories WHERE id = ?';
-    await pool.query(query, [id]);
 
     res.json({ message: 'Category deleted successfully!' });
   } catch (error) {

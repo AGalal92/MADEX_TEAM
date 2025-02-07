@@ -1,26 +1,34 @@
-const pool = require('../db'); // Assuming your db.js exports the MySQL pool
+const mongoose = require('../db'); // MongoDB connection
+const Contact = require('../models/Contact'); // Contact model
 
-async function createContactUsTable() {
-  const createTableQuery = `
-    CREATE TABLE IF NOT EXISTS contact_us (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      name VARCHAR(255) NOT NULL,
-      email VARCHAR(255) NOT NULL,
-      subject VARCHAR(255) NOT NULL,
-      message TEXT NOT NULL,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-    );
-  `;
-
+const createContactCollection = async () => {
   try {
-    await pool.query(createTableQuery);
-    console.log('Contact Us table created successfully.');
-  } catch (error) {
-    console.error('Error creating Contact Us table:', error.message);
-  } finally {
-    pool.end();
-  }
-}
+    // Sample data to populate the collection
+    const contacts = [
+      {
+        name: 'John Doe',
+        email: 'johndoe@example.com',
+        subject: 'Inquiry about services',
+        message: 'I would like to know more about your offerings.',
+      },
+      {
+        name: 'Jane Smith',
+        email: 'janesmith@example.com',
+        subject: 'Support Request',
+        message: 'I need assistance with my account.',
+      },
+    ];
 
-createContactUsTable();
+    // Insert sample data into the collection
+    await Contact.insertMany(contacts);
+    console.log('Migration completed: Contact Us collection created and populated.');
+  } catch (error) {
+    console.error('Error running migration:', error.message);
+  } finally {
+    // Close the connection
+    mongoose.connection.close();
+  }
+};
+
+// Execute the migration
+createContactCollection();

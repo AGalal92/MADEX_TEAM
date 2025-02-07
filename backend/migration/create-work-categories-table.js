@@ -1,24 +1,25 @@
-const pool = require('../db'); // Assuming your db.js exports the MySQL pool
+const mongoose = require('../db'); // MongoDB connection
+const WorkCategory = require('../models/WorkCategory');
 
-async function createWorkCategoriesTable() {
-  const query = `
-    CREATE TABLE IF NOT EXISTS work_categories (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      category VARCHAR(255) NOT NULL,
-      title VARCHAR(255) NOT NULL,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-    );
-  `;
-
+const createWorkCategoriesCollection = async () => {
   try {
-    await pool.query(query);
-    console.log('Work Categories table created successfully.');
-  } catch (error) {
-    console.error('Error creating work categories table:', error.message);
-  } finally {
-    pool.end();
-  }
-}
+    // Sample data to populate the collection
+    const workCategories = [
+      { category: 'Web Development', title: 'Frontend & Backend Development' },
+      { category: 'Mobile Development', title: 'iOS & Android Applications' },
+      { category: 'Graphic Design', title: 'Creative Design & Branding' },
+    ];
 
-createWorkCategoriesTable();
+    // Insert sample data into the collection
+    await WorkCategory.insertMany(workCategories);
+    console.log('Migration completed: Work Categories collection created and populated.');
+  } catch (error) {
+    console.error('Error running migration:', error.message);
+  } finally {
+    // Close the connection
+    mongoose.connection.close();
+  }
+};
+
+// Execute the migration
+createWorkCategoriesCollection();

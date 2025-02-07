@@ -9,7 +9,6 @@ export const useAuth = () => {
   useEffect(() => {
     const checkAuth = async () => {
       const authStatus = await isAuthenticated();
-      console.log("Auth Status:", authStatus); // Verify the auth status
       setAuth(authStatus); // Update global state
     };
 

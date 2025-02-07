@@ -17,7 +17,6 @@ export default function UnauthenticatedLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  console.log("🚀 ~ hello from UnauthenticatedLayout:")
   return (
     <div className={`${GeistSans.variable} ${GeistMono.variable} antialiased`}>
       {children}

@@ -1,10 +1,20 @@
-const pool = require('../db');
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
-const User = {
-  async findByEmail(email) {
-    const [rows] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
-    return rows[0];
+const userSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
   },
-};
+  { timestamps: true }
+);
 
-module.exports = User;
+// Hash password before saving
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next();
+  this.password = await bcrypt.hash(this.password, 10);
+  next();
+});
+
+module.exports = mongoose.model('User', userSchema);

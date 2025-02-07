@@ -1,23 +1,11 @@
-// models/WorkCategory.js
-module.exports = (sequelize, DataTypes) => {
-    const WorkCategory = sequelize.define('WorkCategory', {
-      name: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      slug: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-      },
-    });
-  
-    WorkCategory.associate = (models) => {
-      WorkCategory.hasMany(models.Work, {
-        foreignKey: 'work_category_id',
-        as: 'works',
-      });
-    };
-  
-    return WorkCategory;
-  };
+const mongoose = require('mongoose');
+
+const workCategorySchema = new mongoose.Schema(
+  {
+    category: { type: String, required: true },
+    title: { type: String, required: true },
+  },
+  { timestamps: true } // Automatically creates `createdAt` and `updatedAt`
+);
+
+module.exports = mongoose.model('WorkCategory', workCategorySchema);

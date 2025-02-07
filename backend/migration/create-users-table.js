@@ -1,26 +1,30 @@
-const pool = require('../db'); // Assuming you have db.js for MySQL connection
+const mongoose = require('../db'); // MongoDB connection
+const User = require('../models/User');
 
-async function createUsersTable() {
-  const query = `
-    CREATE TABLE IF NOT EXISTS users (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      name VARCHAR(255) NOT NULL,
-      email VARCHAR(255) NOT NULL UNIQUE,
-      password VARCHAR(255) NOT NULL,
-      role ENUM('admin', 'user', 'guest') DEFAULT 'user',
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-    );
-  `;
-
+const seedUser = async () => {
   try {
-    await pool.query(query);
-    console.log('Users table created successfully.');
-  } catch (error) {
-    console.error('Error creating users table:', error.message);
-  } finally {
-    pool.end();
-  }
-}
+    // Check if user already exists
+    const existingUser = await User.findOne({ email: 'admin@admin.com' });
+    if (existingUser) {
+      console.log('Admin user already exists.');
+      return;
+    }
 
-createUsersTable();
+    // Create an admin user
+    const user = new User({
+      name: 'Admin',
+      email: 'admin@admin.com',
+      password: 'Admin@12345', // Password will be hashed automatically in the model
+    });
+
+    await user.save();
+    console.log('Admin user seeded successfully.');
+  } catch (err) {
+    console.error('Error seeding user:', err);
+  } finally {
+    mongoose.connection.close();
+  }
+};
+
+// Run the seeder
+seedUser();

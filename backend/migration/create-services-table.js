@@ -1,29 +1,58 @@
-const pool = require('../db'); // Assuming your db.js exports the MySQL pool
+const mongoose = require('../db'); // MongoDB connection
+const Service = require('../models/Service');
 
-async function createServicesTable() {
-  const createTableQuery = `
-    CREATE TABLE IF NOT EXISTS services (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      title VARCHAR(255) NOT NULL,
-      icon VARCHAR(255) NOT NULL,
-      image VARCHAR(255) NULL,
-      heading VARCHAR(255) NOT NULL,
-      description TEXT NOT NULL,
-      list_items JSON NOT NULL,
-      paragraph TEXT NOT NULL,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-    );
-  `;
-
+const createServicesCollection = async () => {
   try {
-    const [result] = await pool.query(createTableQuery);
-    console.log('Services table created successfully:', result);
-  } catch (error) {
-    console.error('Error creating services table:', error.message);
-  } finally {
-    pool.end();
-  }
-}
+    // Sample data to populate the collection
+    const services = [
+      {
+        title: 'Web Development',
+        icon: 'bi bi-binoculars',
+        heading: 'Professional Web Development',
+        description: 'We create stunning websites and web applications.',
+        image: '1738105313594-935279978.jpg',
+        list_items: ['Responsive Design', 'SEO Optimization', 'Performance'],
+        paragraph: 'Our team ensures your website is modern and fast.',
+      },
+      {
+        title: 'Web App Development',
+        icon: 'bi bi-binoculars',
+        heading: 'Professional App Development',
+        description: 'We create stunning websites and web applications.',
+        image: '1738105289500-170697844.jpg',
+        list_items: ['Responsive Design', 'SEO Optimization', 'Performance'],
+        paragraph: 'Our team ensures your website is modern and fast.',
+      },
+      {
+        title: 'Web IOS Development',
+        icon: 'bi bi-binoculars',
+        heading: 'Professional IOS Development',
+        description: 'We create stunning websites and web applications.',
+        image: '1738105289500-170697844.jpg',
+        list_items: ['Responsive Design', 'SEO Optimization', 'Performance'],
+        paragraph: 'Our team ensures your website is modern and fast.',
+      },
+      {
+        title: 'Web Desktop Development',
+        icon: 'bi bi-binoculars',
+        heading: 'Professional Desktop Development',
+        description: 'We create stunning websites and web applications.',
+        image: '1738105289500-170697844.jpg',
+        list_items: ['Responsive Design', 'SEO Optimization', 'Performance'],
+        paragraph: 'Our team ensures your website is modern and fast.',
+      },
+    ];
 
-createServicesTable();
+    // Insert sample data into the collection
+    await Service.insertMany(services);
+    console.log('Migration completed: Services collection created and populated.');
+  } catch (error) {
+    console.error('Error running migration:', error.message);
+  } finally {
+    // Close the connection
+    mongoose.connection.close();
+  }
+};
+
+// Execute the migration
+createServicesCollection();

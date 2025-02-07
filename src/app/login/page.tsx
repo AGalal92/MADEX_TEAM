@@ -31,7 +31,7 @@ const SignIn: React.FC = () => {
         localStorage.setItem("authToken", data.token);
         // Update global state
         useAuthStore.getState().setAuth(true);
-        router.push("/"); // Use `replace` instead of `push`
+        router.push("/about"); // Use `replace` instead of `push`
       } else {
         // Handle authentication errors
         setError(data.message || "Invalid email or password");
@@ -58,7 +58,7 @@ const SignIn: React.FC = () => {
               </Link>
 
               <p className="mb-8 text-lg text-gray-400">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit suspendisse.
+              Sign in to go to MADEX Dashboard 
               </p>
 
               <div className="mt-8">
@@ -169,7 +169,7 @@ const SignIn: React.FC = () => {
                   Sign In
                 </button>
 
-                <div className="mt-6 text-center">
+                {/* <div className="mt-6 text-center">
                   <p className="text-sm text-gray-400">
                     Don’t have an account?{" "}
                     <Link
@@ -179,7 +179,7 @@ const SignIn: React.FC = () => {
                       Sign Up
                     </Link>
                   </p>
-                </div>
+                </div> */}
               </form>
             </div>
           </div>

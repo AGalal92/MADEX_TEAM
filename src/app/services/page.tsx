@@ -31,9 +31,16 @@ import {
 import { Edit, Delete, Add, Close } from '@mui/icons-material';
 import axios from 'axios';
 import Image from 'next/image';
-
+import { useRouter } from 'next/navigation';
 
 const ServicesTable = () => {
+  const router = useRouter();
+  useEffect(() => {
+    const authToken = localStorage.getItem('authToken');
+    if (!authToken) {
+      router.push('/login');
+    }
+  }, [router]);
   const [services, setServices] = useState([]);
   const [editService, setEditService] = useState(null);
   const [formData, setFormData] = useState({
@@ -192,7 +199,7 @@ const ServicesTable = () => {
 
     try {
       if (editService) {
-        await axios.put(`${API_BASE_URL}/${editService.id}`, data);
+        await axios.put(`${API_BASE_URL}/${editService._id}`, data);
       } else {
         await axios.post(API_BASE_URL, data);
       }
@@ -276,7 +283,7 @@ const ServicesTable = () => {
                     <IconButton color="primary" onClick={() => handleOpenModal(service)}>
                       <Edit />
                     </IconButton>
-                    <IconButton color="secondary" onClick={() => handleOpenDialog(service.id)}>
+                    <IconButton color="secondary" onClick={() => handleOpenDialog(service._id)}>
                       <Delete />
                     </IconButton>
                   </TableCell>
@@ -514,6 +521,8 @@ const ServicesTable = () => {
                           <Image
                             src={imagePreview}
                             alt="Preview"
+                            width={500} // Replace with your image's width
+                            height={300} // Replace with your image's height
                             style={{
                               width: '100%',
                               borderRadius: 4,

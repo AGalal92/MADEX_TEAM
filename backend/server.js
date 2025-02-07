@@ -9,6 +9,8 @@ const workRoutes = require('./routes/workRoutes');
 const servicesRoutes = require('./routes/servicesRoutes');
 const contactUsRoutes = require('./routes/contactUsRoutes');
 const teamRoutes = require('./routes/teamRoutes');
+const mongoose = require('./db');
+
 dotenv.config();
 
 const app = express();

@@ -7,7 +7,7 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
 export default function Features({ services }) {
-  const [activeTab, setActiveTab] = useState(services?.[0]?.id || ''); // Set the first service's ID as the default active tab
+  const [activeTab, setActiveTab] = useState(services?.[0]?._id || ''); // Set the first service's ID as the default active tab
 
   // Slider settings
   const sliderSettings = {
@@ -52,18 +52,18 @@ export default function Features({ services }) {
         {/* Tabs Navigation */}
         <Slider {...sliderSettings} className="nav-tabs-slider">
           {services.map((service) => (
-            <div key={service.id} className="nav-item" role="presentation">
+            <div key={service._id} className="nav-item" role="presentation">
               <button
-                className={`nav-link ${activeTab === service.id ? 'active show' : ''}`}
-                onClick={() => setActiveTab(service.id)}
+                className={`nav-link ${activeTab === service._id ? 'active show' : ''}`}
+                onClick={() => setActiveTab(service._id)}
                 role="tab"
                 style={{
                   minWidth: '300px',
                   maxWidth: '300px',
                   wordWrap: 'break-word', // Ensures long words are wrapped
                   overflowWrap: 'break-word', // Handles wrapping for browsers
-                  backgroundColor: activeTab === service.id ? '#ffc107' : '',
-                  borderColor: activeTab === service.id ? '#ffc107' : '',
+                  backgroundColor: activeTab === service._id ? '#ffc107' : '',
+                  borderColor: activeTab === service._id ? '#ffc107' : '',
                 }}
               >
                 <i className={service.icon}></i>
@@ -91,9 +91,9 @@ export default function Features({ services }) {
         >
           {services.map((service) => (
             <div
-              key={service.id}
-              className={`tab-pane fade ${activeTab === service.id ? 'active show' : ''}`}
-              id={service.id}
+              key={service._id}
+              className={`tab-pane fade ${activeTab === service._id ? 'active show' : ''}`}
+              id={service._id}
               role="tabpanel"
             >
               <div className="row">

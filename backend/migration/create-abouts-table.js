@@ -1,31 +1,33 @@
-const pool = require('../db'); // Assuming your db.js exports the MySQL pool
+const mongoose = require('../db'); // Import your MongoDB connection
+const About = require('../models/About'); // Import the About model
 
-async function createAboutsTable() {
-  const createTableQuery = `
-    CREATE TABLE IF NOT EXISTS abouts (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      title VARCHAR(255) DEFAULT '',
-      img1 VARCHAR(255) NULL,
-      img2 VARCHAR(255) NULL,
-      slug1 VARCHAR(255) DEFAULT '',
-      slug2 VARCHAR(255) DEFAULT '',
-      par1 TEXT NULL,
-      par2 TEXT NULL,
-      list_items JSON NOT NULL,
-      link VARCHAR(255) NULL,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-    );
-  `;
-
+const createAboutsCollection = async () => {
   try {
-    const [result] = await pool.query(createTableQuery);
-    console.log('Abouts table created successfully:', result);
-  } catch (error) {
-    console.error('Error creating abouts table:', error.message);
-  } finally {
-    pool.end();
-  }
-}
+    // Sample data to populate the collection
+    const abouts = [
+      {
+        title: 'About Us',
+        slug1: 'about-us',
+        slug2: 'our-story',
+        par1: 'We are a team dedicated to excellence.',
+        par2: 'Our story began in 2020, and we have been growing since.',
+        link: 'https://example.com/about-us',
+        list_items: ['Integrity', 'Innovation', 'Commitment'],
+        img1: null,
+        img2: null,
+      },
+    ];
 
-createAboutsTable();
+    // Insert sample data into the collection
+    await About.insertMany(abouts);
+    console.log('Migration completed: Abouts collection created and populated.');
+  } catch (error) {
+    console.error('Error running migration:', error.message);
+  } finally {
+    // Close the connection
+    mongoose.connection.close();
+  }
+};
+
+// Execute the migration
+createAboutsCollection();

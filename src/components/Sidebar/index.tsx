@@ -205,7 +205,6 @@ const menuGroups = [
 const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const pathname = usePathname();
   const [pageName, setPageName] = useLocalStorage("selectedMenu", "dashboard");
-  console.log("🚀 ~ Sidebar ~ pageName:", pageName)
 
   return (
     <ClickOutside onClick={() => setSidebarOpen(false)}>

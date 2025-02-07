@@ -1,37 +1,32 @@
-const fs = require('fs'); // Import the file system module
-const path = require('path'); // Import the path module
-const pool = require('../db'); // Assuming db.js exports the MySQL pool
+const Service = require('../models/Service');
+const path = require('path');
+const fs = require('fs');
 
 // Get all services
 const getAllServices = async (req, res) => {
   try {
-    const [rows] = await pool.query('SELECT * FROM services');
-    res.json(rows); // Correctly returns JSON
+    const services = await Service.find();
+    res.json(services);
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching services', error: error.message }); // JSON error response
+    res.status(500).json({ message: 'Error fetching services', error: error.message });
   }
 };
-
-
 
 // Get a single service by ID
 const getServiceById = async (req, res) => {
   try {
     const { id } = req.params;
-    const [rows] = await pool.query('SELECT * FROM services WHERE id = ?', [id]);
+    const service = await Service.findById(id);
 
-    if (rows.length === 0) {
+    if (!service) {
       return res.status(404).json({ message: 'Service not found' });
     }
-
-    const service = { ...rows[0], list_items: JSON.parse(rows[0].list_items || '[]') };
 
     res.json(service);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching service', error: error.message });
   }
 };
-
 
 // Create a new service
 const createService = async (req, res) => {
@@ -40,100 +35,82 @@ const createService = async (req, res) => {
 
     const image = req.files?.image ? req.files.image[0].filename : null;
 
-   // Parse list_items and ensure it's an array
-   const sanitizedListItems = list_items ? JSON.parse(list_items) : [];
+    // Ensure list_items is always an array
+    let sanitizedListItems = [];
+    if (list_items) {
+      try {
+        sanitizedListItems = JSON.parse(list_items);
+        if (!Array.isArray(sanitizedListItems)) {
+          throw new Error('list_items must be an array');
+        }
+      } catch (error) {
+        return res.status(400).json({ message: 'Invalid list_items format. Must be a JSON array.' });
+      }
+    }
 
-    const query = `
-      INSERT INTO services (title, icon, image, heading, description, list_items, paragraph)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `;
-    await pool.query(query, [
+    const service = new Service({
       title,
       icon,
       image,
       heading,
       description,
-      JSON.stringify(sanitizedListItems), // Save as JSON array in the database
+      list_items: sanitizedListItems,
       paragraph,
-    ]);
+    });
 
-    res.status(201).json({ message: 'Service created successfully!' });
+    await service.save();
+    res.status(201).json({ message: 'Service created successfully!', service });
   } catch (error) {
     res.status(500).json({ message: 'Error creating service', error: error.message });
   }
 };
 
-
 // Update a service
 const updateService = async (req, res) => {
   try {
     const { id } = req.params;
+    let updates = { ...req.body };
 
-    // Fetch existing service data
-    const [rows] = await pool.query('SELECT * FROM services WHERE id = ?', [id]);
+    if (updates.list_items) {
+      try {
+        updates.list_items = JSON.parse(updates.list_items);
+        if (!Array.isArray(updates.list_items)) {
+          throw new Error('list_items must be an array');
+        }
+      } catch (error) {
+        return res.status(400).json({ message: 'Invalid list_items format. Must be a JSON array.' });
+      }
+    }
 
-    if (rows.length === 0) {
+    if (req.files?.image) {
+      updates.image = req.files.image[0].filename;
+    }
+
+    const service = await Service.findByIdAndUpdate(id, updates, { new: true });
+
+    if (!service) {
       return res.status(404).json({ message: 'Service not found' });
     }
 
-    const existingService = rows[0];
-
-    // Extract updated fields from the request body
-    const {
-      title = existingService.title,
-      icon = existingService.icon,
-      heading = existingService.heading,
-      description = existingService.description,
-      paragraph = existingService.paragraph,
-      list_items = JSON.parse(existingService.list_items || '[]'),
-    } = req.body;
-
-    // Handle the `list_items` field
-    const sanitizedListItems = Array.isArray(list_items) ? list_items : JSON.parse(list_items);
-
-    // Handle image field, only update if a new file is uploaded
-    const image = req.files?.image ? req.files.image[0].filename : existingService.image;
-
-    // Update query with merged values
-    const query = `
-      UPDATE services
-      SET title = ?, icon = ?, image = ?, heading = ?, description = ?, list_items = ?, paragraph = ?
-      WHERE id = ?
-    `;
-
-    await pool.query(query, [
-      title,
-      icon,
-      image,
-      heading,
-      description,
-      JSON.stringify(sanitizedListItems),
-      paragraph,
-      id,
-    ]);
-
-    res.json({ message: 'Service updated successfully!' });
+    res.json({ message: 'Service updated successfully!', service });
   } catch (error) {
     res.status(500).json({ message: 'Error updating service', error: error.message });
   }
 };
-
-
-
 
 // Delete a service
 const deleteService = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const [rows] = await pool.query('SELECT image FROM services WHERE id = ?', [id]);
-
-    if (rows.length > 0 && rows[0].image) {
-      fs.unlinkSync(path.join(__dirname, '../storage', rows[0].image));
+    const service = await Service.findById(id);
+    if (!service) {
+      return res.status(404).json({ message: 'Service not found' });
     }
 
-    await pool.query('DELETE FROM services WHERE id = ?', [id]);
+    if (service.image) fs.unlinkSync(path.join(__dirname, '../storage', service.image));
 
+    await Service.findByIdAndDelete(id);
     res.json({ message: 'Service deleted successfully!' });
   } catch (error) {
     res.status(500).json({ message: 'Error deleting service', error: error.message });

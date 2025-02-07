@@ -29,8 +29,15 @@ import {
 } from '@mui/material';
 import { Edit, Delete, Add, Close } from '@mui/icons-material';
 import axios from 'axios';
-
+import { useRouter } from 'next/navigation';
 const WorkCategoriesTable = () => {
+  const router = useRouter();
+  useEffect(() => {
+    const authToken = localStorage.getItem('authToken');
+    if (!authToken) {
+      router.push('/');
+    }
+  }, [router]);
   const [categories, setCategories] = useState([]);
   const [editCategory, setEditCategory] = useState(null);
   const [formData, setFormData] = useState({ category: '', title: '' });
@@ -84,7 +91,7 @@ const WorkCategoriesTable = () => {
 
     try {
       if (editCategory) {
-        await axios.put(`${API_BASE_URL}/${editCategory.id}`, formData);
+        await axios.put(`${API_BASE_URL}/${editCategory._id}`, formData);
       } else {
         await axios.post(API_BASE_URL, formData);
       }
@@ -160,14 +167,14 @@ const WorkCategoriesTable = () => {
             </TableHead>
             <TableBody>
               {categories.map((category) => (
-                <TableRow key={category.id} sx={{ '&:nth-of-type(odd)': { backgroundColor: theme.palette.action.hover } }}>
+                <TableRow key={category._id} sx={{ '&:nth-of-type(odd)': { backgroundColor: theme.palette.action.hover } }}>
                   <TableCell>{category.category}</TableCell>
                   <TableCell>{category.title}</TableCell>
                   <TableCell>
                     <IconButton color="primary" onClick={() => handleOpenModal(category)}>
                       <Edit />
                     </IconButton>
-                    <IconButton color="secondary" onClick={() => handleOpenDialog(category.id)}>
+                    <IconButton color="secondary" onClick={() => handleOpenDialog(category._id)}>
                       <Delete />
                     </IconButton>
                   </TableCell>

@@ -29,8 +29,16 @@ import {
 import { Edit, Delete, Add, Close } from '@mui/icons-material';
 import axios from 'axios';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 const TeamTable = () => {
+  const router = useRouter();
+  useEffect(() => {
+    const authToken = localStorage.getItem('authToken');
+    if (!authToken) {
+      router.push('/');
+    }
+  }, [router]);
   const [teamMembers, setTeamMembers] = useState([]);
   const [editMember, setEditMember] = useState(null);
   const [formData, setFormData] = useState({ name: '', position: '', image: null });
@@ -148,7 +156,7 @@ const TeamTable = () => {
 
     try {
       if (editMember) {
-        await axios.put(`${API_BASE_URL}/${editMember.id}`, data);
+        await axios.put(`${API_BASE_URL}/${editMember._id}`, data);
       } else {
         await axios.post(API_BASE_URL, data);
       }
@@ -222,6 +230,8 @@ const TeamTable = () => {
                 <TableRow key={member.id} sx={{ '&:nth-of-type(odd)': { backgroundColor: 'action.hover' } }}>
                   <TableCell>
                     <Image
+                      width={500} // Replace with your image's width
+                      height={300} // Replace with your image's height
                       src={`${STORAGE_BASE_URL}/${member.image}`}
                       alt={member.name}
                       style={{ width: 50, height: 50, borderRadius: '50%' }}
@@ -233,7 +243,7 @@ const TeamTable = () => {
                     <IconButton color="primary" onClick={() => handleOpenModal(member)}>
                       <Edit />
                     </IconButton>
-                    <IconButton color="secondary" onClick={() => handleOpenDialog(member.id)}>
+                    <IconButton color="secondary" onClick={() => handleOpenDialog(member._id)}>
                       <Delete />
                     </IconButton>
                   </TableCell>
@@ -342,6 +352,8 @@ const TeamTable = () => {
                       {imagePreview && (
                         <Box mt={2} sx={{ position: 'relative' }}>
                           <Image
+                            width={500} // Replace with your image's width
+                            height={300} // Replace with your image's height
                             src={imagePreview}
                             alt="Preview"
                             style={{

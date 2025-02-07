@@ -30,8 +30,17 @@ import {
 import { Edit, Delete, Add, Close } from '@mui/icons-material';
 import axios from 'axios';
 import Image from 'next/image';
-
+import { useRouter } from "next/navigation";
 const AboutsTable = () => {
+
+  const router = useRouter();
+  useEffect(() => {
+    const authToken = localStorage.getItem('authToken');
+    if (!authToken) {
+      router.push('/');
+    }
+  }, [router]);
+  
   const [abouts, setAbouts] = useState([]);
   const [editAbout, setEditAbout] = useState(null);
   const [formData, setFormData] = useState({
@@ -166,7 +175,7 @@ const AboutsTable = () => {
 
     try {
       if (editAbout) {
-        await axios.put(`${API_BASE_URL}/${editAbout.id}`, data, {
+        await axios.put(`${API_BASE_URL}/${editAbout._id}`, data, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
@@ -260,7 +269,7 @@ const AboutsTable = () => {
           color="primary"
           startIcon={<Add />}
           onClick={() => handleOpenModal()}
-          disabled={abouts.length > 0} // Disable button if there's any data
+          // disabled={abouts.length > 0} // Disable button if there's any data
           sx={{ textTransform: 'none', fontWeight: 'bold' }}
         >
           Create
@@ -295,7 +304,7 @@ const AboutsTable = () => {
                   </IconButton>
                   <IconButton
                     color="secondary"
-                    onClick={() => handleOpenDialog(about.id)}
+                    onClick={() => handleOpenDialog(about._id)}
                   >
                     <Delete />
                   </IconButton>
@@ -568,6 +577,8 @@ const AboutsTable = () => {
                         <Image
                           src={img1Preview}
                           alt="Preview 1"
+                          width={500} // Replace with your image's width
+                          height={300} // Replace with your image's height
                           style={{
                             width: '100%',
                             borderRadius: 4,
@@ -621,6 +632,8 @@ const AboutsTable = () => {
                         <Image
                           src={img2Preview}
                           alt="Preview 2"
+                          width={500} // Replace with your image's width
+                          height={300} // Replace with your image's height
                           style={{
                             width: '100%',
                             borderRadius: 4,

@@ -27,8 +27,16 @@ import {
 } from '@mui/material';
 import { Delete, Visibility, Close } from '@mui/icons-material';
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
 
 const ContactUsTable = () => {
+  const router = useRouter();
+  useEffect(() => {
+    const authToken = localStorage.getItem('authToken');
+    if (!authToken) {
+      router.push('/');
+    }
+  }, [router]);
   const [contacts, setContacts] = useState([]);
   const [viewContact, setViewContact] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -127,7 +135,7 @@ const ContactUsTable = () => {
                     <IconButton color="primary" onClick={() => handleViewContact(contact)}>
                       <Visibility />
                     </IconButton>
-                    <IconButton color="secondary" onClick={() => handleOpenDialog(contact.id)}>
+                    <IconButton color="secondary" onClick={() => handleOpenDialog(contact._id)}>
                       <Delete />
                     </IconButton>
                   </TableCell>

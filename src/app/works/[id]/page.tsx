@@ -57,17 +57,19 @@ export default function WorkDetails() {
       try {
         const response = await fetch(`http://localhost:5001/api/works/${id}`);
         if (!response.ok) throw new Error('Failed to fetch work details');
+  
         const data = await response.json();
-        if (Array.isArray(data) && data.length > 0) {
-          setWork(data[0]);
+        setWork(data); // ✅ Directly set the object
+  
+        // ✅ Correct fetching of category
+        if (data.work_category_id?._id) {
           const categoryResponse = await fetch(
-            `http://localhost:5001/api/work-categories/${data[0].work_category_id}`
+            `http://localhost:5001/api/work-categories/${data.work_category_id._id}`
           );
           if (!categoryResponse.ok) throw new Error('Failed to fetch category details');
+  
           const categoryData = await categoryResponse.json();
           setCategory(categoryData.category);
-        } else {
-          setWork(null);
         }
       } catch (error) {
         console.error('Error fetching work details:', error);
@@ -76,9 +78,10 @@ export default function WorkDetails() {
         setLoading(false);
       }
     };
-
+  
     fetchWorkDetails();
   }, [id]);
+  
 
   const handleBeforeAfterSlider = (event) => {
     const rect = event.currentTarget.getBoundingClientRect();
@@ -205,6 +208,8 @@ export default function WorkDetails() {
                         style={{ height: '100%', width: '100%' }}
                       >
                         <Image
+                          width={500} // Replace with your image's width
+                          height={300} // Replace with your image's height
                           src={`${STORAGE_BASE_URL}/${work.slider_images[currentSlide]}`}
                           alt={`Slide ${currentSlide + 1}`}
                           style={{ 
@@ -300,6 +305,8 @@ export default function WorkDetails() {
                  <Image
                     src={`${STORAGE_BASE_URL}/${work.image_before}`}
                     alt="Before"
+                    width={500} // Replace with your image's width
+                    height={300} // Replace with your image's height
                     style={{
                       position: 'absolute',
                       inset: 0,
@@ -318,6 +325,8 @@ export default function WorkDetails() {
                     <Image
                       src={`${STORAGE_BASE_URL}/${work.image_after}`}
                       alt="After"
+                      width={500} // Replace with your image's width
+                      height={300} // Replace with your image's height
                       style={{
                         width: '100%',
                         height: '100%',

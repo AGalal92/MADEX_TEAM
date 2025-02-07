@@ -20,18 +20,21 @@ export default function Portfolio({ category, project }) {
   }
 
   // Get unique category IDs from the project
-  const projectCategoryIds = [...new Set(project.map((proj) => proj.categoryId))];
+  const projectCategoryIds = [...new Set(project.map((proj) => proj.categoryId._id))];
+  
 
   // Filter categories to only include those that are present in the project data
   const filteredCategories = category.filter((cat) =>
-    projectCategoryIds.includes(cat.id)
+    projectCategoryIds.includes(cat._id)
   );
 
   // Filter works based on the active filter
   const filteredWorks =
     activeFilter === '*'
-      ? project
-      : project.filter((work) => work.categoryId.toString() === activeFilter);
+    ? project
+    : project.filter((work) => work.categoryId._id.toString() === activeFilter);
+    
+
 
   // Open video modal
   const handleOpenVideoModal = (video) => {
@@ -95,11 +98,11 @@ export default function Portfolio({ category, project }) {
             </li>
             {filteredCategories.map((cat) => (
               <li
-                key={cat.id}
-                className={activeFilter === cat.id.toString() ? 'active' : ''}
-                onClick={() => setActiveFilter(cat.id.toString())}
+                key={cat._id}
+                className={activeFilter === cat._id.toString() ? 'active' : ''}
+                onClick={() => setActiveFilter(cat._id.toString())}
                 style={{
-                  color: activeFilter === cat.id.toString() ? '#ffc107' : '',
+                  color: activeFilter === cat._id.toString() ? '#ffc107' : '',
                   cursor: 'pointer',
                 }}
               >
@@ -112,7 +115,7 @@ export default function Portfolio({ category, project }) {
           <div className="row gy-4 isotope-container" data-aos="fade-up" data-aos-delay="200">
             {filteredWorks.map((work) => (
               <div
-                key={work.id}
+                key={work._id}
                 className="col-lg-4 col-md-6 portfolio-item isotope-item"
               >
                 <div className="portfolio-content" style={{ textAlign: 'center' }}>
@@ -120,7 +123,7 @@ export default function Portfolio({ category, project }) {
                     {/* Image */}
                     <Image
                       src={`${STORAGE_BASE_URL}/${work.image}`} // Use the correct image path
-                      alt={`Project ${work.id}`}
+                      alt={`Project ${work._id}`}
                       width={400}
                       height={300}
                       className="img-fluid"
@@ -129,9 +132,9 @@ export default function Portfolio({ category, project }) {
 
                     {/* Portfolio Info */}
                     <div className="portfolio-info" style={{ textAlign: 'center', marginTop: '10px' }}>
-                      <h4>Project #{work.id}</h4>
+                      <h4>Project #{work._id}</h4>
                       <p>
-                        {filteredCategories.find((cat) => cat.id === work.categoryId)?.category}
+                        {filteredCategories.find((cat) => cat._id === work.categoryId)?.category}
                       </p>
                       <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', marginTop: '40px' }}>
                         {/* Review Video Icon */}

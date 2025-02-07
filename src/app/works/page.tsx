@@ -35,8 +35,16 @@ import {
 import { Edit, Delete, Add, Close } from '@mui/icons-material';
 import axios from 'axios';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 const WorksTable = () => {
+  const router = useRouter();
+  useEffect(() => {
+    const authToken = localStorage.getItem('authToken');
+    if (!authToken) {
+      router.push('/');
+    }
+  }, [router]);
   const [works, setWorks] = useState([]);
   const [categories, setCategories] = useState([]);
   const [editWork, setEditWork] = useState(null);
@@ -109,7 +117,6 @@ const WorksTable = () => {
   const fetchCategories = async () => {
     try {
       const response = await axios.get(CATEGORIES_URL);
-      console.log("🚀 ~ fetchCategories ~ response:", response)
       setCategories(response.data);
     } catch (error) {
       console.error('Error fetching categories:', error);
@@ -178,7 +185,7 @@ const WorksTable = () => {
       setFormData({
         title: work.title,
         slug: work.slug,
-        work_category_id: work.work_category_id,
+        work_category_id: work.work_category_id ? work.work_category_id._id : '', // ✅ Ensure it's an ID
       });
       setPreviews({
         image: work.image ? `${STORAGE_BASE_URL}/${work.image}` : null,
@@ -242,7 +249,7 @@ const WorksTable = () => {
     try {
       if (editWork) {
         // Update existing work
-        await axios.put(`${API_BASE_URL}/${editWork.id}`, data, {
+        await axios.put(`${API_BASE_URL}/${editWork._id}`, data, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
         showSnackbar('Works updated successfully!', 'success');
@@ -321,17 +328,17 @@ const WorksTable = () => {
             </TableHead>
             <TableBody>
               {works.map((work) => (
-                <TableRow key={work.id} sx={{ '&:nth-of-type(odd)': { backgroundColor: theme.palette.action.hover } }}>
+                <TableRow key={work._id} sx={{ '&:nth-of-type(odd)': { backgroundColor: theme.palette.action.hover } }}>
                   <TableCell>{work.title}</TableCell>
                   <TableCell>{work.slug}</TableCell>
                   <TableCell>
-                    {categories.find(c => c.id === work.work_category_id)?.category}
+                    {categories.find(c => c._id === work.work_category_id)?.category}
                   </TableCell>
                   <TableCell>
                     <IconButton  color="primary" onClick={() => handleOpenModal(work)}>
                       <Edit />
                     </IconButton>
-                    <IconButton  color="secondary" onClick={() => { setDeleteId(work.id); setDialogOpen(true); }}>
+                    <IconButton  color="secondary" onClick={() => { setDeleteId(work._id); setDialogOpen(true); }}>
                       <Delete />
                     </IconButton>
                   </TableCell>
@@ -423,7 +430,7 @@ const WorksTable = () => {
                         label="Category"
                       >
                         {categories.map(category => (
-                          <MenuItem key={category.id} value={category.id}>
+                          <MenuItem key={category._id} value={category._id}>
                             {category.category}
                           </MenuItem>
                         ))}
@@ -473,6 +480,8 @@ const WorksTable = () => {
                               <Image
                                 src={previews[field]}
                                 alt={field}
+                                width={500} // Replace with your image's width
+                                height={300} // Replace with your image's height
                                 style={{
                                   width: '100%',
                                   borderRadius: 4,
@@ -562,6 +571,8 @@ const WorksTable = () => {
                               <Image
                                 src={imageUrl}
                                 alt={`Slider ${index}`}
+                                width={500} // Replace with your image's width
+                                height={300} // Replace with your image's height
                                 style={{
                                   width: 100,
                                   height: 100,

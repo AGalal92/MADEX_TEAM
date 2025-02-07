@@ -8,11 +8,14 @@ import { useAuthStore } from "@/store/authStore";
 const DropdownUser = () => {
   const router = useRouter();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  
   const handleSignOut = () => {
     localStorage.removeItem("authToken"); // Remove the token
+    localStorage.removeItem("token"); // Remove the token
     useAuthStore.getState().setAuth(false); // Update global state
-    router.push("/"); // Redirect to the sign-in page
+    router.replace("/"); // ✅ Force redirect (replace current URL)
   };
+  
   return (
     <ClickOutside onClick={() => setDropdownOpen(false)} className="relative">
       <Link
