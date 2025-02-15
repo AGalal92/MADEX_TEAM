@@ -9,14 +9,15 @@ class Work extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'slug', 'image', 'video', 'slider_images','work_category_id'];
+    protected $fillable = [
+        'title', 'slug', 'image', 'video', 'image_before', 'image_after', 'slider_images', 'work_category_id'
+    ];
 
     protected $casts = [
-        'slider_images' => 'array',
+        'slider_images' => 'array', // ✅ Ensure it's cast as an array
     ];
-    
 
-    public function category()
+    public function workCategory()
     {
         return $this->belongsTo(WorkCategory::class, 'work_category_id');
     }

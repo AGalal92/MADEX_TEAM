@@ -5,23 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class About extends Model
+class Team extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'title',
-        'slug1',
-        'slug2',
-        'par1',
-        'par2',
-        'link',
-        'list_items',
-        'img1',
-        'img2',
+        'name',
+        'position',
+        'social_links',
+        'image',
     ];
 
     protected $casts = [
-        'list_items' => 'array',
+        'social_links' => 'array',
     ];
 }

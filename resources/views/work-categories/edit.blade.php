@@ -13,12 +13,15 @@
                         @csrf
                         @method('PUT')
                         <div class="mb-4">
-                            <label for="name" class="block text-sm font-medium">Name</label>
-                            <input type="text" name="name" id="name" value="{{ $workCategory->name }}" class="mt-1 block w-full" required>
+                            <label for="category" class="block text-sm font-medium">Category</label>
+                            <input
+                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+                             type="text" name="category" id="category" value="{{ $workCategory->category }}" class="mt-1 block w-full" required>
                         </div>
                         <div class="mb-4">
-                            <label for="slug" class="block text-sm font-medium">Slug</label>
-                            <input type="text" name="slug" id="slug" value="{{ $workCategory->slug }}" class="mt-1 block w-full" required>
+                            <label for="title" class="block text-sm font-medium">Title</label>
+                            <input
+                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300" type="text" name="title" id="title" value="{{ $workCategory->title }}" class="mt-1 block w-full" required>
                         </div>
                         <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded">Update</button>
                     </form>

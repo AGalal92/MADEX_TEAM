@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Works') }}
+            {{ __('Services') }}
         </h2>
     </x-slot>
 
@@ -15,44 +15,36 @@
                         </div>
                     @endif
 
-                    <h3 class="text-lg font-bold mb-4">List of Works</h3>
+                    <h3 class="text-lg font-bold mb-4">List of Services</h3>
 
-                    <a href="{{ route('works.create') }}" class="mb-4 inline-block px-4 py-2 bg-blue-500 text-white rounded">
-                        + Add New Work
+                    <a href="{{ route('services.create') }}" class="mb-4 inline-block px-4 py-2 bg-blue-500 text-white rounded">
+                        + Add New Service
                     </a>
 
                     <table class="min-w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700">
                         <thead class="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
                             <tr>
                                 <th class="py-2 px-4 border-b">Title</th>
-                                <th class="py-2 px-4 border-b">Slug</th>
-                                <th class="py-2 px-4 border-b">Category</th>
+                                <th class="py-2 px-4 border-b">Icon</th>
                                 <th class="py-2 px-4 border-b">Image</th>
-                                <th class="py-2 px-4 border-b">Slider Images</th>
                                 <th class="py-2 px-4 border-b">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($works as $work)
+                            @foreach ($services as $service)
                                 <tr class="border-b hover:bg-gray-100 dark:hover:bg-gray-700">
-                                    <td class="py-2 px-4">{{ $work->title }}</td>
-                                    <td class="py-2 px-4">{{ $work->slug }}</td>
-                                    <td class="py-2 px-4">{{ $work->workCategory->category }}</td> <!-- Updated to use 'category' -->
+                                    <td class="py-2 px-4">{{ $service->title }}</td>
+                                    <td class="py-2 px-4">{{ $service->icon }}</td>
                                     <td class="py-2 px-4">
-                                        <img src="{{ $work->image ? Storage::url($work->image) : asset('assets/images/default-image.png') }}"
-                                             alt="{{ $work->title }}" class="h-16 w-16 object-cover rounded">
-                                    </td>
-                                    <td class="py-2 px-4">
-                                        <div class="flex space-x-2">
-                                            @foreach ($work->slider_images ?? [] as $sliderImage)
-                                                <img src="{{ Storage::url($sliderImage) }}"
-                                                     alt="Slider Image" class="h-12 w-12 object-cover rounded">
-                                            @endforeach
-                                        </div>
+                                        @if($service->image)
+                                            <img src="{{ Storage::url($service->image) }}" alt="{{ $service->title }}" class="h-16 w-16 object-cover rounded">
+                                        @else
+                                            <p class="text-gray-500">No image</p>
+                                        @endif
                                     </td>
                                     <td class="py-2 px-4 flex space-x-2">
-                                        <a href="{{ route('works.edit', $work->id) }}" class="text-blue-500 hover:underline">Edit</a>
-                                        <form action="{{ route('works.destroy', $work->id) }}" method="POST" class="inline-block">
+                                        <a href="{{ route('services.edit', $service->id) }}" class="text-blue-500 hover:underline">Edit</a>
+                                        <form action="{{ route('services.destroy', $service->id) }}" method="POST" class="inline-block">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="text-red-500 hover:underline" onclick="return confirm('Are you sure?');">Delete</button>

@@ -21,6 +21,18 @@
                     <x-nav-link :href="route('works.index')" :active="request()->routeIs('works.*')">
                         {{ __('Works') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('about.edit')" :active="request()->routeIs('about.*')">
+                        {{ __('About') }} <!-- Updated to 'About' -->
+                    </x-nav-link>
+                    <x-nav-link :href="route('services.index')" :active="request()->routeIs('services.*')">
+                        <i class="fas fa-cogs mr-2"></i> {{ __('Services') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('teams.index')" :active="request()->routeIs('teams.*')">
+                        <i class="fas fa-cogs mr-2"></i> {{ __('Teams') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('contacts.index')" :active="request()->routeIs('contacts.*')">
+                        <i class="fas fa-cogs mr-2"></i> {{ __('Contacts') }}
+                    </x-nav-link>
                 </div>
             </div>
 

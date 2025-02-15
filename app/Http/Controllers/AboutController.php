@@ -4,62 +4,68 @@ namespace App\Http\Controllers;
 
 use App\Models\About;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class AboutController extends Controller
 {
-    // Display the edit form
-    public function edit()
+    /**
+     * Display the About section in a Blade view.
+     */
+    public function index()
     {
-        $about = About::first(); // Retrieve the single record
-        if (!$about) {
-            // Create the record if it doesn't exist
-            $about = About::create([
-                'title' => '',
-                'img1' => null,
-                'img2' => null,
-                'slug1' => '',
-                'slug2' => '',
-                'par1' => '',
-                'par2' => '',
-                'link' => '',
-            ]);
-        }
-
-        return view('abouts.edit', compact('about'));
+        $about = About::first();
+        return view('about.index', compact('about'));
     }
 
-    // Update the record
+    /**
+     * Show the form for creating or editing the About section.
+     */
+    public function edit()
+    {
+        $about = About::first();
+        return view('about.edit', compact('about'));
+    }
+
+    /**
+     * Create or update the About section.
+     */
     public function update(Request $request)
     {
-        // dd('sss');
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'slug1' => 'required|string|max:255',
+            'slug2' => 'required|string|max:255',
+            'par1' => 'required|string',
+            'par2' => 'required|string',
+            'link' => 'nullable|string|max:255',
+            'list_items' => 'nullable|array', // Change to array validation
+            'img1' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'img2' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
 
-        $about = About::first();
+        $about = About::firstOrNew([]);
 
-        // $request->validate([
-        //     'title' => 'required|string|max:255',
-        //     'slug1' => 'required|string|max:255',
-        //     'slug2' => 'required|string|max:255',
-        //     'par1' => 'required|string',
-        //     'par2' => 'required|string',
-        //     'link' => 'nullable|string|max:255',
-        //     'img1' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-        //     'img2' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-        // ]);
-
-        $data = $request->all();
-        // dd($data);
-
-        // Handle file uploads
         if ($request->hasFile('img1')) {
-            $data['img1'] = $request->file('img1')->store('about_images', 'public');
+            if ($about->img1) {
+                Storage::disk('public')->delete($about->img1);
+            }
+            $about->img1 = $request->file('img1')->store('about_images', 'public');
         }
 
         if ($request->hasFile('img2')) {
-            $data['img2'] = $request->file('img2')->store('about_images', 'public');
+            if ($about->img2) {
+                Storage::disk('public')->delete($about->img2);
+            }
+            $about->img2 = $request->file('img2')->store('about_images', 'public');
         }
 
-        $about->update($data);
+        // Handle list_items
+        $listItems = $request->input('list_items', []);
+        $about->list_items = array_filter($listItems); // Remove empty items
 
-        return redirect()->route('about.edit')->with('success', 'About section updated successfully.');
+        $about->fill($request->except(['img1', 'img2', 'list_items']));
+        $about->save();
+
+        return redirect()->route('about.index')->with('success', 'About section updated successfully!');
     }
 }

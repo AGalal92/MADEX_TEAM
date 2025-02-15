@@ -5,17 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class WorkCategory extends Model
+class Contact extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'category',
-        'title',
+        'name',
+        'email',
+        'subject',
+        'message',
     ];
-
-    public function works()
-    {
-        return $this->hasMany(Work::class, 'work_category_id');
-    }
 }

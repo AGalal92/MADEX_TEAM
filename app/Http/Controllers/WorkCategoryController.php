@@ -7,47 +7,68 @@ use Illuminate\Http\Request;
 
 class WorkCategoryController extends Controller
 {
+    /**
+     * Display a listing of work categories.
+     */
     public function index()
     {
         $categories = WorkCategory::all();
         return view('work-categories.index', compact('categories'));
     }
 
+    /**
+     * Show the form for creating a new work category.
+     */
     public function create()
     {
         return view('work-categories.create');
     }
 
+    /**
+     * Store a newly created work category in the database.
+     */
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255|unique:work_categories,name',
-            'slug' => 'required|string|max:255|unique:work_categories,slug',
+            'category' => 'required|string|max:255',
+            'title' => 'required|string|max:255',
         ]);
 
         WorkCategory::create($request->all());
-        return redirect()->route('work-categories.index')->with('success', 'Category created successfully.');
+
+        return redirect()->route('work-categories.index')->with('success', 'Category created successfully!');
     }
 
+    /**
+     * Show the form for editing an existing work category.
+     */
     public function edit(WorkCategory $workCategory)
     {
         return view('work-categories.edit', compact('workCategory'));
     }
 
+    /**
+     * Update an existing work category.
+     */
     public function update(Request $request, WorkCategory $workCategory)
     {
         $request->validate([
-            'name' => 'required|string|max:255|unique:work_categories,name,' . $workCategory->id,
-            'slug' => 'required|string|max:255|unique:work_categories,slug,' . $workCategory->id,
+            'category' => 'required|string|max:255',
+            'title' => 'required|string|max:255',
         ]);
 
         $workCategory->update($request->all());
-        return redirect()->route('work-categories.index')->with('success', 'Category updated successfully.');
+
+        return redirect()->route('work-categories.index')->with('success', 'Category updated successfully!');
     }
 
+    /**
+     * Remove a work category from the database.
+     */
     public function destroy(WorkCategory $workCategory)
     {
         $workCategory->delete();
-        return redirect()->route('work-categories.index')->with('success', 'Category deleted successfully.');
+
+        return redirect()->route('work-categories.index')->with('success', 'Category deleted successfully!');
     }
 }
