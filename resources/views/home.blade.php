@@ -1093,7 +1093,7 @@
           <span>All Rights Reserved</span>
         </p>
         <div class="credits">
-          Designed by <a href="#">Legion</a>
+          Designed by <a href="https://legionagency.tech">Legion</a>
         </div>
       </div>
     </footer>
