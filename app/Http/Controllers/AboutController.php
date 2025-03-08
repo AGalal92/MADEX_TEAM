@@ -66,6 +66,6 @@ class AboutController extends Controller
         $about->fill($request->except(['img1', 'img2', 'list_items']));
         $about->save();
 
-        return redirect()->route('about.index')->with('success', 'About section updated successfully!');
+        return redirect()->route('about.edit')->with('success', 'About section updated successfully!');
     }
 }

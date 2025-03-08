@@ -2,21 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Team extends Model
 {
-    use HasFactory;
-
-    protected $fillable = [
-        'name',
-        'position',
-        'social_links',
-        'image',
-    ];
+    protected $fillable = ['name', 'position', 'social_links', 'image'];
 
     protected $casts = [
-        'social_links' => 'array',
+        'social_links' => 'array', // Automatically casts JSON to array
     ];
 }

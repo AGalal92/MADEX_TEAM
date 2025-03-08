@@ -753,66 +753,70 @@
 
 
         <!-- Portfolio Section -->
-        <section id="portfolio" class="portfolio section dark-background">
-            <div class="container section-title aos-init aos-animate" data-aos="fade-up">
-                <h2>Portfolio</h2>
-                <p>CHECK OUR PORTFOLIO</p>
-            </div>
+       <!-- resources/views/portfolio.blade.php -->
 
-            <div class="container">
-                @if(isset($categories) && $categories->count() > 0 && isset($works) && $works->count() > 0)
-                    <div class="isotope-layout" data-default-filter="*" data-layout="masonry" data-sort="original-order">
-                        <!-- Portfolio Filters -->
-                        <ul class="portfolio-filters isotope-filters aos-init aos-animate" data-aos="fade-up" data-aos-delay="100">
-                            <li data-filter="*" class="filter-active">All</li>
-                            @foreach($categories as $category)
-                                <li data-filter=".filter-{{ $category->id }}">{{ ucfirst($category->category) }}</li>
-                            @endforeach
-                        </ul>
+<section id="portfolio" class="portfolio section dark-background">
+    <div class="container section-title aos-init aos-animate" data-aos="fade-up">
+        <h2>Portfolio</h2>
+        <p>CHECK OUR PORTFOLIO</p>
+    </div>
 
-                        <!-- Portfolio Items -->
-                        <div class="row gy-4 isotope-container aos-init aos-animate" data-aos="fade-up" data-aos-delay="200">
-                            @foreach($works as $work)
-                                <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-{{ $work->work_category_id }}">
-                                    <div class="portfolio-content h-100">
-                                        <img src="{{ $work->image ? asset('storage/' . $work->image) : asset('assets/images/default-image.png') }}"
-                                            class="img-fluid" alt="{{ $work->title }}" onerror="this.src='{{ asset('assets/images/default-image.png') }}';"/>
+    <div class="container">
+        @if(isset($categories) && $categories->count() > 0 && isset($works) && $works->count() > 0)
+            <div class="isotope-layout" data-default-filter="*" data-layout="masonry" data-sort="original-order">
+                <!-- Portfolio Filters -->
+                <ul class="portfolio-filters isotope-filters aos-init aos-animate" data-aos="fade-up" data-aos-delay="100">
+                    <li data-filter="*" class="filter-active">All</li>
+                    @foreach($categories as $category)
+                        <li data-filter=".filter-{{ $category->id }}">{{ ucfirst($category->category) }}</li>
+                    @endforeach
+                </ul>
 
-                                        <div class="portfolio-info">
-                                            <h4>{{ $work->title }}</h4>
-                                            <p>{{ $work->workCategory->category ?? 'Uncategorized' }}</p>
+                <!-- Portfolio Items -->
+                <div class="row gy-4 isotope-container aos-init aos-animate" data-aos="fade-up" data-aos-delay="200">
+                    @foreach($works as $work)
+                        <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-{{ $work->work_category_id }}">
+                            <div class="portfolio-content h-100">
+                                <a href="{{ route('work.details', $work->id) }}">
+                                    <img src="{{ $work->image ? asset('storage/' . $work->image) : asset('assets/images/default-image.png') }}"
+                                        class="img-fluid" alt="{{ $work->title }}" onerror="this.src='{{ asset('assets/images/default-image.png') }}';"/>
+                                </a>
 
-                                            <a href="{{ $work->image ? asset('storage/' . $work->image) : asset('assets/images/default-image.png') }}"
-                                                title="{{ $work->title }}" data-gallery="portfolio-gallery-{{ $work->work_category_id }}"
-                                                class="glightbox preview-link">
-                                                <i class="bi bi-zoom-in"></i>
-                                            </a>
+                                <div class="portfolio-info">
+                                    <h4>{{ $work->title }}</h4>
+                                    <p>{{ $work->workCategory->category ?? 'Uncategorized' }}</p>
 
-                                            @if($work->video)
-                                                <a href="#" onclick="openVideoModal('{{ asset('storage/' . $work->video) }}'); return false;"
-                                                    title="Watch Video" class="details-link">
-                                                    <i class="bi bi-play-circle"></i>
-                                                </a>
-                                            @endif
+                                    <a href="{{ $work->image ? asset('storage/' . $work->image) : asset('assets/images/default-image.png') }}"
+                                    title="{{ $work->title }}" data-gallery="portfolio-gallery-{{ $work->work_category_id }}"
+                                    class="glightbox preview-link">
+                                        <i class="bi bi-zoom-in"></i>
+                                    </a>
 
-                                            <a href="#" title="More Details" class="details-link">
-                                                <i class="bi bi-link-45deg"></i>
-                                            </a>
-                                        </div>
-                                    </div>
+                                    @if($work->video)
+                                        <a href="#" onclick="openVideoModal('{{ asset('storage/' . $work->video) }}'); return false;"
+                                        title="Watch Video" class="details-link">
+                                            <i class="bi bi-play-circle"></i>
+                                        </a>
+                                    @endif
+
+                                    <a href="{{ route('work.details', $work->id) }}" title="More Details" class="details-link">
+                                        <i class="bi bi-link-45deg"></i>
+                                    </a>
                                 </div>
-                            @endforeach
+                            </div>
                         </div>
-                    </div>
-                @else
-                    <!-- Fallback if no portfolio items available -->
-                    <div class="text-center text-white">
-                        <h3>No Portfolio Items Available</h3>
-                        <p>Please check back later or contact us for more information.</p>
-                    </div>
-                @endif
+                    @endforeach
+                </div>
             </div>
-        </section>
+        @else
+            <!-- Fallback if no portfolio items available -->
+            <div class="text-center text-white">
+                <h3>No Portfolio Items Available</h3>
+                <p>Please check back later or contact us for more information.</p>
+            </div>
+        @endif
+    </div>
+</section>
 
         <!-- Video Modal -->
         <div id="videoModal" class="modal fade" tabindex="-1" role="dialog">

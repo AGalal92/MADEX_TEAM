@@ -19,7 +19,9 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::post('/contacts', [ContactController::class, 'store'])->name('contacts.store');
+// routes/web.php
 
+Route::get('/work/{id}', [WorkController::class, 'show'])->name('work.details');
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

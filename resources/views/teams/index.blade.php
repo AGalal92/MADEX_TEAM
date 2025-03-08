@@ -31,11 +31,10 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($team as $member)
+                            @foreach ($teamMembers as $member)
                                 <tr class="border-b hover:bg-gray-100 dark:hover:bg-gray-700">
                                     <td class="py-2 px-4">{{ $member->name }}</td>
                                     <td class="py-2 px-4">{{ $member->position }}</td>
-
                                     <td class="py-2 px-4">
                                         @if($member->image)
                                             <img src="{{ Storage::url($member->image) }}" alt="{{ $member->name }}" class="h-16 w-16 object-cover rounded">

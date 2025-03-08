@@ -9,26 +9,68 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
+                    @if (session('success'))
+                        <div class="mb-4 text-green-600">{{ session('success') }}</div>
+                    @endif
+                    @if ($errors->any())
+                        <div class="mb-4 text-red-600">
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
                     <form action="{{ route('teams.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
 
                         <!-- Name -->
                         <div class="mb-4">
                             <label for="name" class="block text-sm font-medium">Name</label>
-                            <input type="text" name="name" id="name" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300" required>
+                            <input type="text" name="name" id="name" value="{{ old('name') }}"
+                                   class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300" required>
+                            @error('name')
+                                <span class="text-red-500 text-sm">{{ $message }}</span>
+                            @enderror
                         </div>
 
                         <!-- Position -->
                         <div class="mb-4">
                             <label for="position" class="block text-sm font-medium">Position</label>
-                            <input type="text" name="position" id="position" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300" required>
+                            <input type="text" name="position" id="position" value="{{ old('position') }}"
+                                   class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300" required>
+                            @error('position')
+                                <span class="text-red-500 text-sm">{{ $message }}</span>
+                            @enderror
                         </div>
 
                         <!-- Social Links -->
                         <div class="mb-4">
                             <label class="block text-sm font-medium">Social Links</label>
                             <div id="social-links-container" class="mt-1 space-y-2">
-                                <!-- Dynamic social links will be added here -->
+                                @if (old('social_links'))
+                                    @foreach (old('social_links') as $index => $link)
+                                        <div class="flex items-center space-x-2">
+                                            <input type="text" name="social_links[{{$index}}][url]" placeholder="e.g., https://facebook.com" value="{{ $link['url'] ?? '' }}"
+                                                   class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300">
+                                            <input type="text" name="social_links[{{$index}}][icon]" placeholder="e.g., bi-facebook" value="{{ $link['icon'] ?? '' }}"
+                                                   class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300">
+                                            <button type="button" class="text-red-500 hover:text-red-700" onclick="removeSocialLink(this)">Remove</button>
+                                            @error("social_links.$index.url")
+                                                <span class="text-red-500 text-sm">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                    @endforeach
+                                @else
+                                    <div class="flex items-center space-x-2">
+                                        <input type="text" name="social_links[0][url]" placeholder="e.g., https://facebook.com"
+                                               class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300">
+                                        <input type="text" name="social_links[0][icon]" placeholder="e.g., bi-facebook"
+                                               class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300">
+                                        <button type="button" class="text-red-500 hover:text-red-700" onclick="removeSocialLink(this)">Remove</button>
+                                    </div>
+                                @endif
                             </div>
                             <button type="button" onclick="addSocialLink()" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded">Add Social Link</button>
                         </div>
@@ -36,8 +78,13 @@
                         <!-- Image -->
                         <div class="mb-4">
                             <label for="image" class="block text-sm font-medium">Image</label>
-                            <input type="file" name="image" id="image" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300" onchange="previewImage(event, 'image-preview')">
+                            <input type="file" name="image" id="image"
+                                   class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+                                   onchange="previewImage(event, 'image-preview')">
                             <img id="image-preview" src="#" alt="Image Preview" class="h-32 w-32 object-cover rounded mt-2 hidden">
+                            @error('image')
+                                <span class="text-red-500 text-sm">{{ $message }}</span>
+                            @enderror
                         </div>
 
                         <!-- Submit Button -->
@@ -51,25 +98,27 @@
     </div>
 
     <script>
-        // Add Social Link
+        let socialLinkIndex = {{ old('social_links') ? count(old('social_links')) : 1 }};
+
         function addSocialLink() {
             const container = document.getElementById('social-links-container');
             const newLink = document.createElement('div');
             newLink.classList.add('flex', 'items-center', 'space-x-2');
             newLink.innerHTML = `
-                <input type="text" name="social_links[][url]" placeholder="URL" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300">
-                <input type="text" name="social_links[][icon]" placeholder="Icon" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300">
+                <input type="text" name="social_links[${socialLinkIndex}][url]" placeholder="e.g., https://facebook.com"
+                       class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300">
+                <input type="text" name="social_links[${socialLinkIndex}][icon]" placeholder="e.g., bi-facebook"
+                       class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300">
                 <button type="button" class="text-red-500 hover:text-red-700" onclick="removeSocialLink(this)">Remove</button>
             `;
             container.appendChild(newLink);
+            socialLinkIndex++;
         }
 
-        // Remove Social Link
         function removeSocialLink(button) {
             button.parentElement.remove();
         }
 
-        // Image Preview
         function previewImage(event, previewId) {
             const preview = document.getElementById(previewId);
             const file = event.target.files[0];

@@ -18,6 +18,13 @@ class WorkController extends Controller
         return view('works.index', compact('works'));
     }
 
+
+public function show($id)
+{
+    $work = Work::findOrFail($id);
+    return view('works.work-details', compact('work'));
+}
+
     /**
      * Show the form for creating a new work.
      */
